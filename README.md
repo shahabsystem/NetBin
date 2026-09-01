@@ -11,7 +11,3 @@
 - Quick Settings Tile و شروع خودکار
 - آیکون جدید
 
-## Build
-Workflow در `.github/workflows/build.yml` قرار دارد و APK نسخه GitHub را می‌سازد.
-
-> توجه: APK انتشار GitHub به صورت unsigned ساخته می‌شود؛ برای انتشار در فروشگاه باید signing را به workflow اضافه کنید.
