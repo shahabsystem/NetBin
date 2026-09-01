@@ -1,64 +1,17 @@
 <resources>
-    <string name="app_name">Virtual Hosts</string>
-    <string name="action_settings">Settings</string>
-    <string name="update_button">update</string>
-    <string name="update_hosts">select ip update hosts</string>
-    <string name="clear_hosts">clear hosts</string>
-    <string name="load_hosts">loads hosts</string>
-    <string name="backup_hosts">backup hosts</string>
-    <string name="start_vpn">start vpn</string>
-    <string name="stop_vpn">stop vpn</string>
-    <string name="re_select_hosts">Re-select Hosts File</string>
-    <string name="select_hosts">Select Hosts File</string>
-    <string name="info">supports wildcard DNS records,Example:\nabc.com\nm.abc.com\nweb.abc.com\n=>.abc.com</string>
-    <string name="dialog_title">
-        <font color="@color/primary_text">Please Select Hosts File</font>
-    </string>
-    <string name="dialog_message">
-        <font color="@color/secondary_text">The Hosts File unselected or been deleted</font>
-    </string>
-    <string name="dialog_confirm">confirm</string>
-    <string name="dialog_cancel">cancel</string>
-    <string name="dns_server">8.8.8.8</string>
-    <string name="file_select_error">Error ! System File Browser Not Find, Will Use Url Mode</string>
-    <string name="permission_error">Error ! No Permission</string>
-    <string name="fab_label_setting">Setting</string>
-    <string name="fab_label_boot">On Startup</string>
-    <string name="fab_label_donation">Donate</string>
-    <string name="welcome">Your support is the greatest impetus for us.\nYou can support us through the following
-        ways.
-    </string>
-    <string name="rate">Rate on the Store</string>
-    <string name="alipay">Donate with Alipay</string>
-    <string name="wechat">Donate with WeChat</string>
-    <string name="paypal">Donate with Paypal</string>
-    <string name="googleplay">Donate with Google Play</string>
-    <string name="googleplay2">Donate $2 with Google Play</string>
-    <string name="googleplay4">Donate $4 with Google Play</string>
-    <string name="googleplay6">Donate $6 with Google Play</string>
-    <string name="googleplay8">Donate $8 with Google Play</string>
-    <string name="googleplay10">Donate $10 with Google Play</string>
-    <string name="bitcoin">Donate with Bitcoin</string>
-    <string name="tip_bitcoin">bitcoin address has copy to the clipboard</string>
-    <string name="radio_local">from local</string>
-    <string name="radio_net">from internet</string>
-    <string name="url_error">URL input is incorrect</string>
-    <string name="dns4_error">DNS input is incorrect</string>
-    <string name="down_success">Download Success Get %d Host Records</string>
-    <string name="down_error">Download Failed</string>
-    <string name="runing_notice">Virtual Hosts Is Running</string>
-
-    <string name="pref_ps_set_hosts_url">set net hosts url</string>
-    <string name="pref_ps_set_cus_dns">set custom dns</string>
-
-    <string name="title_pref_remote_hosts">remote hosts url</string>
-    <string name="pref_remote_hosts">remote hosts url</string>
-    <string name="pref_is_net">use net hosts</string>
-    <string name="pref_dns">custom dns</string>
-    <string name="pref_dns_title">use custom dns</string>
-    <string name="download_alert">Downloading File...</string>
-
-    <string name="no_net_record">warning! net hosts file no dns record, please check</string>
-    <string name="no_local_record">warning! local hosts file no dns record, please check</string>
-
+ <string name="app_name">VHosts Pro</string><string name="settings_title">تنظیمات VHosts Pro</string>
+ <string name="start_vpn">فعال‌سازی محافظت</string><string name="stop_vpn">محافظت خاموش</string><string name="select_hosts">انتخاب فایل Hosts</string><string name="re_select_hosts">تغییر فایل Hosts</string>
+ <string name="status_running">محافظت فعال است</string><string name="status_stopped">محافظت خاموش است</string><string name="source_adblock">فیلتر تبلیغات و ردیاب‌ها فعال</string><string name="source_hosts_only">فقط Hosts سفارشی</string>
+ <string name="button_settings">تنظیمات</string><string name="button_support">حمایت از توسعه</string><string name="button_boot">شروع خودکار</string><string name="boot_on">شروع خودکار: روشن</string><string name="boot_off">شروع خودکار: خاموش</string>
+ <string name="dialog_title">فایل Hosts انتخاب نشده</string><string name="dialog_message">برای شروع، یک فایل Hosts انتخاب کنید یا از لیست آنلاین استفاده کنید.</string><string name="dialog_confirm">انتخاب فایل</string><string name="dialog_cancel">لغو</string>
+ <string name="permission_error">دسترسی به فایل ممکن نیست.</string><string name="file_select_error">فایل‌منیجر سیستم در دسترس نیست.</string><string name="hosts_selected">فایل Hosts انتخاب شد.</string><string name="start_error">آماده‌سازی محافظت انجام نشد.</string>
+ <string name="dns_server">1.1.1.1</string><string name="dns4_error">آدرس DNS معتبر نیست.</string><string name="url_error">نشانی اینترنتی معتبر نیست.</string>
+ <string name="pref_cat_protection">مسدودسازی تبلیغات و ردیاب‌ها</string><string name="pref_adblock">مسدودسازی تبلیغات</string><string name="pref_adblock_summary">دامنه‌های تبلیغاتی و ردیاب‌ها قبل از اتصال فیلتر می‌شوند.</string><string name="pref_adblock_url">نشانی لیست فیلتر</string><string name="pref_adblock_url_summary">یک فایل hosts سازگار وارد کنید.</string><string name="pref_update_adblock">به‌روزرسانی لیست فیلتر</string><string name="pref_update_adblock_summary">لیست فیلتر را دانلود و در حافظه محلی ذخیره می‌کند.</string><string name="default_adblock_url">https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts</string><string name="adblock_updating">در حال دریافت لیست فیلتر…</string><string name="adblock_updated">لیست فیلتر به‌روز شد؛ %d دامنه پردازش شد.</string><string name="adblock_update_error">دریافت لیست فیلتر ناموفق بود.</string>
+ <string name="pref_cat_dns">DNS سفارشی</string><string name="pref_dns_title">استفاده از DNS سفارشی</string><string name="pref_dns_custom_summary">DNS اول و دوم برای پاسخ‌گویی سریع‌تر و قابل انتخاب.</string><string name="pref_dns_primary">DNS اصلی</string><string name="pref_dns_secondary">DNS پشتیبان</string><string name="pref_dns_preset">پروفایل آماده DNS</string><string name="pref_dns_preset_summary">یک سرویس شناخته‌شده یا حالت سفارشی را انتخاب کنید.</string>
+ <string name="pref_cat_hosts">منبع Hosts</string><string name="title_pref_remote_hosts">آدرس Hosts آنلاین</string><string name="pref_remote_hosts">دریافت Hosts از اینترنت</string><string name="pref_is_net">استفاده از Hosts آنلاین</string>
+ <string name="pref_cat_interface">رابط و پشتیبان‌گیری</string><string name="pref_theme">تم برنامه</string><string name="pref_export">خروجی گرفتن از تنظیمات</string><string name="pref_export_summary">تنظیمات را به فایل JSON منتقل کنید.</string><string name="pref_import">وارد کردن تنظیمات</string><string name="pref_import_summary">یک فایل JSON قبلی را بازیابی کنید.</string><string name="settings_exported">تنظیمات ذخیره شد.</string><string name="settings_imported">تنظیمات بازیابی شد.</string><string name="settings_file_error">فایل تنظیمات قابل خواندن نیست.</string>
+ <string name="pref_cat_about">درباره برنامه</string><string name="about_summary">VHosts Pro 3.0 — Hosts + AdBlock + Custom DNS
+بدون نیاز به Root</string>
+ <string name="support_title">حمایت از توسعه‌دهنده</string><string name="support_message">اگر VHosts Pro برایتان مفید است، با ستاره دادن به پروژه، معرفی آن یا ارسال پیشنهاد به ادامه توسعه کمک کنید.</string><string name="support_github">پروفایل GitHub</string><string name="support_repo">صفحه پروژه</string><string name="support_email">ارتباط و ارسال پیشنهاد در GitHub</string><string name="support_email_subject">VHosts Pro — پیشنهاد یا گزارش مشکل</string>
+ <string name="support_note">حمایت شما باعث می‌شود امکانات بیشتری مثل DoH/DoT، آمار مسدودسازی و لیست‌های بیشتر اضافه کنیم.</string>
 </resources>

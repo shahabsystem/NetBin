@@ -1,0 +1,6 @@
+<resources>
+ <string-array name="theme_names"><item>روشن</item><item>تاریک</item><item>مطابق سیستم</item></string-array>
+ <string-array name="theme_values"><item>light</item><item>dark</item><item>system</item></string-array>
+ <string-array name="dns_names"><item>Cloudflare — 1.1.1.1 / 1.0.0.1</item><item>Google — 8.8.8.8 / 8.8.4.4</item><item>Quad9 — 9.9.9.9 / 149.112.112.112</item><item>AdGuard — 94.140.14.14 / 94.140.15.15</item><item>سفارشی</item></string-array>
+ <string-array name="dns_values"><item>cloudflare</item><item>google</item><item>quad9</item><item>adguard</item><item>custom</item></string-array>
+</resources>
