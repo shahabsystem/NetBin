@@ -1,74 +1,37 @@
-plugins {
-    id 'com.android.application'
-    id 'com.google.gms.google-services'
-}
+plugins { id 'com.android.application' }
+
 android {
+    namespace 'com.github.xfalcon.vhosts'
     compileSdk 36
     defaultConfig {
         applicationId "com.github.xfalcon.vhosts"
-        minSdkVersion 19
-        targetSdkVersion 36
-        versionCode 43
-        versionName "2.2.3"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        minSdk 21
+        targetSdk 36
+        versionCode 50
+        versionName "3.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
-    productFlavors.all {
-        flavor -> flavor.manifestPlaceholders = [Market_CHANNEL_VALUE: name]
-    }
-    flavorDimensions "CHANNEL"
-
+    flavorDimensions += "CHANNEL"
     productFlavors {
-        googleplay {
-            dimension "CHANNEL"
-            buildConfigField("boolean", "IS_GooglePlay", "true")
-        }
-        github {
-            dimension "CHANNEL"
-            buildConfigField("boolean", "IS_GooglePlay", "false")
-        }
-
+        googleplay { dimension "CHANNEL"; buildConfigField("boolean", "IS_GooglePlay", "true") }
+        github { dimension "CHANNEL"; buildConfigField("boolean", "IS_GooglePlay", "false") }
     }
     buildTypes {
-        release {
-            minifyEnabled true
-            zipAlignEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            buildConfigField("boolean", "IS_GooglePlay", "false")
-        }
+        release { minifyEnabled true; shrinkResources true; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' }
+        debug { minifyEnabled false }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    namespace 'com.github.xfalcon.vhosts'
-
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation platform('com.google.firebase:firebase-bom:32.1.0')
-    implementation 'com.google.firebase:firebase-analytics'
-
-    implementation 'com.android.support:appcompat-v7:33.0.0'
-    implementation 'com.android.support:cardview-v7:33.0.0'
-    implementation 'com.android.support:preference-v7:33.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.github.zcweng:switch-button:0.0.3@aar'
-    implementation 'com.github.clans:fab:1.6.4'
-    implementation 'com.android.billingclient:billing:6.0.1'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'org.slf4j:slf4j-api:1.7.36'
-
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
-    compileOnly 'org.projectlombok:lombok:1.18.42'
-    annotationProcessor 'org.projectlombok:lombok:1.18.42'
 }
-
