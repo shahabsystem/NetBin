@@ -1,287 +1,55 @@
-/*
- **Copyright (C) 2017  xfalcon
- **
- **This program is free software: you can redistribute it and/or modify
- **it under the terms of the GNU General Public License as published by
- **the Free Software Foundation, either version 3 of the License, or
- **(at your option) any later version.
- **
- **This program is distributed in the hope that it will be useful,
- **but WITHOUT ANY WARRANTY; without even the implied warranty of
- **MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- **GNU General Public License for more details.
- **
- **You should have received a copy of the GNU General Public License
- **along with this program.  If not, see <http://www.gnu.org/licenses/>.
- **
- */
-
 package com.github.xfalcon.vhosts;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.*;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.app.*;
+import android.content.*;
+import android.net.Uri;
+import android.os.*;
 import android.widget.Toast;
 import androidx.preference.*;
 import com.github.xfalcon.vhosts.util.FileUtils;
 import com.github.xfalcon.vhosts.util.HttpUtils;
-import com.github.xfalcon.vhosts.util.LogUtils;
 import com.github.xfalcon.vhosts.vservice.DnsChange;
+import org.json.JSONObject;
 import org.xbill.DNS.Address;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.util.Map;
 
-public class SettingsFragment extends PreferenceFragmentCompat implements
-        SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public static final int VPN_REQUEST_CODE=0x0F, SELECT_FILE_CODE=0x05, EXPORT_CODE=0x06, IMPORT_CODE=0x07;
+    public static final String PREFS_NAME=SettingsFragment.class.getName();
+    public static final String IS_NET="IS_NET", HOSTS_URL="HOSTS_URL", HOSTS_URI="HOST_URI", NET_HOST_FILE="net_hosts";
+    public static final String IPV4_DNS="IPV4_DNS", IPV4_DNS2="IPV4_DNS2", IS_CUS_DNS="IS_CUS_DNS";
+    public static final String ADBLOCK_ENABLED="ADBLOCK_ENABLED", ADBLOCK_URL="ADBLOCK_URL";
 
-    private static String TAG = SettingsFragment.class.getName();
-
-    public static final int VPN_REQUEST_CODE = 0x0F;
-    public static final int SELECT_FILE_CODE = 0x05;
-    public static final String PREFS_NAME = SettingsFragment.class.getName();
-    public static final String IS_NET = "IS_NET";
-    public static final String HOSTS_URL = "HOSTS_URL";
-    public static final String HOSTS_URI = "HOST_URI";
-    public static final String NET_HOST_FILE = "net_hosts";
-    public static final String IPV4_DNS = "IPV4_DNS";
-    public static final String IS_CUS_DNS = "IS_CUS_DNS";
-
-    private Handler handler = null;
-
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.preferences, rootKey);
-        final SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
-        PreferenceScreen prefScreen = getPreferenceScreen();
-        handeleSummary(prefScreen, sharedPreferences);
-        Preference urlCustomPref = findPreference(HOSTS_URL);
-        Preference dnsCustomPref = findPreference(IPV4_DNS);
-
-        dnsCustomPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                String ipv4_dns = (String)newValue;
-                try {
-                    Address.getByAddress(ipv4_dns);
-                    return true;
-                } catch (Exception e) {
-                    LogUtils.e(TAG, e.getMessage(), e);
-                    Toast.makeText(preference.getContext(), getString(R.string.dns4_error), Toast.LENGTH_LONG).show();
-                }
-                return false;
-            }
-        });
-
-
-//        dnsCustomPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//
-//            public boolean onPreferenceClick(Preference preference) {
-//                String ipv4_dns = sharedPreferences.getString(IPV4_DNS, "");
-//                try {
-//                    Address.getByAddress(ipv4_dns);
-//                    return true;
-//                } catch (Exception e) {
-//                    LogUtils.e(TAG, e.getMessage(), e);
-//                    Toast.makeText(preference.getContext(), getString(R.string.url_error), Toast.LENGTH_LONG).show();
-//                }
-//                return false;
-//            }
-//        });
-
-        urlCustomPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                String url = (String)newValue;
-                if (isUrl(url)) {
-                    setProgressDialog(preference.getContext(), url);
-                    return true;
-                } else {
-                    Toast.makeText(preference.getContext(), getString(R.string.url_error), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-            }
-        });
-
-//        urlCustomPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//
-//            public boolean onPreferenceClick(Preference preference) {
-//                String url = sharedPreferences.getString(HOSTS_URL, "");
-//                if (isUrl(url)) {
-//                    setProgressDialog(preference.getContext(), url);
-//                    return true;
-//                } else {
-//                    Toast.makeText(preference.getContext(), getString(R.string.url_error), Toast.LENGTH_LONG).show();
-//                    return false;
-//                }
-//
-//            }
-//        });
+    @Override public void onCreatePreferences(Bundle state,String rootKey){
+        setPreferencesFromResource(R.xml.preferences,rootKey);
+        SharedPreferences p=getPreferenceManager().getSharedPreferences();
+        Preference dns=findPreference(IPV4_DNS), dns2=findPreference(IPV4_DNS2), url=findPreference(HOSTS_URL);
+        ListPreference preset=findPreference("DNS_PRESET");
+        if(preset!=null) preset.setOnPreferenceChangeListener((pr,v)->{String x=String.valueOf(v);SharedPreferences.Editor e=p.edit();if("cloudflare".equals(x)){e.putString(IPV4_DNS,"1.1.1.1").putString(IPV4_DNS2,"1.0.0.1");}else if("google".equals(x)){e.putString(IPV4_DNS,"8.8.8.8").putString(IPV4_DNS2,"8.8.4.4");}else if("quad9".equals(x)){e.putString(IPV4_DNS,"9.9.9.9").putString(IPV4_DNS2,"149.112.112.112");}else if("adguard".equals(x)){e.putString(IPV4_DNS,"94.140.14.14").putString(IPV4_DNS2,"94.140.15.15");}e.apply();return true;});
+        Preference export=findPreference("EXPORT_SETTINGS"), imp=findPreference("IMPORT_SETTINGS"), update=findPreference("UPDATE_ADBLOCK");
+        if(dns!=null) dns.setOnPreferenceChangeListener((pr,v)->validIp((String)v,pr.getContext()));
+        if(dns2!=null) dns2.setOnPreferenceChangeListener((pr,v)->validIp((String)v,pr.getContext()));
+        if(url!=null) url.setOnPreferenceChangeListener((pr,v)->validUrl((String)v));
+        if(export!=null) export.setOnPreferenceClickListener(pr->{exportSettings();return true;});
+        if(imp!=null) imp.setOnPreferenceClickListener(pr->{importSettings();return true;});
+        if(update!=null) update.setOnPreferenceClickListener(pr->{downloadAdBlock();return true;});
+        updateSummaries(getPreferenceScreen(),p);
     }
-
-    public void setProgressDialog(final Context context, final String url) {
-
-        int llPadding = 30;
-        LinearLayout ll = new LinearLayout(context);
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setPadding(llPadding, llPadding, llPadding, llPadding);
-        ll.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams llParam = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        llParam.gravity = Gravity.CENTER;
-        ll.setLayoutParams(llParam);
-
-        ProgressBar progressBar = new ProgressBar(context);
-        progressBar.setIndeterminate(true);
-        progressBar.setPadding(0, 0, llPadding, 0);
-        progressBar.setLayoutParams(llParam);
-
-        llParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        llParam.gravity = Gravity.CENTER;
-        TextView tvText = new TextView(context);
-        tvText.setText(getString(R.string.download_alert));
-        tvText.setTextColor(Color.parseColor("#000000"));
-        tvText.setTextSize(20);
-        tvText.setLayoutParams(llParam);
-
-        ll.addView(progressBar);
-        ll.addView(tvText);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setCancelable(true);
-        builder.setView(ll);
-
-        final AlertDialog dialog = builder.create();
-        Window window = dialog.getWindow();
-        if (window != null) {
-            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-            layoutParams.copyFrom(dialog.getWindow().getAttributes());
-            layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            dialog.getWindow().setAttributes(layoutParams);
-        }
-        handler = new Handler();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Looper.prepare();
-                    String result = HttpUtils.get(url);
-                    FileUtils.writeFile(context.openFileOutput(NET_HOST_FILE, Context.MODE_PRIVATE), result);
-                    Toast.makeText(context, String.format(getString(R.string.down_success), DnsChange.handle_hosts(context.openFileInput(NET_HOST_FILE))), Toast.LENGTH_LONG).show();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.hide();
-                        }
-                    });
-                    Looper.loop();
-                } catch (Exception e) {
-                    Toast.makeText(context, getString(R.string.down_error), Toast.LENGTH_LONG).show();
-                    LogUtils.e(TAG, e.getMessage(), e);
-                }
-
-            }
-        }).start();
-        dialog.show();
-
+    private boolean validIp(String s,Context c){try{Address.getByAddress(s);return true;}catch(Exception e){Toast.makeText(c,R.string.dns4_error,Toast.LENGTH_LONG).show();return false;}}
+    private boolean validUrl(String s){if(s!=null && (s.startsWith("http://")||s.startsWith("https://")))return true;Toast.makeText(requireContext(),R.string.url_error,Toast.LENGTH_LONG).show();return false;}
+    private void downloadAdBlock(){
+        Toast.makeText(requireContext(),R.string.adblock_updating,Toast.LENGTH_SHORT).show();
+        new Thread(()->{try{int n=AdBlockManager.update(requireContext());requireActivity().runOnUiThread(()->Toast.makeText(requireContext(),getString(R.string.adblock_updated,n),Toast.LENGTH_LONG).show());}catch(Exception e){requireActivity().runOnUiThread(()->Toast.makeText(requireContext(),R.string.adblock_update_error,Toast.LENGTH_LONG).show());}}).start();
     }
-
-    private void handeleSummary(PreferenceGroup preferenceGroup, SharedPreferences sharedPreferences) {
-        int count = preferenceGroup.getPreferenceCount();
-
-        for (int i = 0; i < count; i++) {
-            Preference p = preferenceGroup.getPreference(i);
-            if (p instanceof PreferenceCategory) {
-                handeleSummary((PreferenceCategory) p, sharedPreferences);
-            }
-            if (!(p instanceof CheckBoxPreference)) {
-                String value = sharedPreferences.getString(p.getKey(), "");
-                setPreferenceSummary(p, value);
-            }
-        }
+    private void updateSummaries(PreferenceGroup g,SharedPreferences p){for(int i=0;i<g.getPreferenceCount();i++){Preference x=g.getPreference(i);if(x instanceof PreferenceGroup)updateSummaries((PreferenceGroup)x,p);else if(x.getKey()!=null && !(x instanceof CheckBoxPreference) && !(x instanceof ListPreference)) x.setSummary(p.getString(x.getKey(),x.getSummary()==null?"":x.getSummary().toString()));}}
+    private void exportSettings(){
+        Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);i.setType("application/json");i.putExtra(Intent.EXTRA_TITLE,"vhosts-settings.json");startActivityForResult(i,EXPORT_CODE);
     }
-
-    private void setPreferenceSummary(Preference preference, String value) {
-        if (preference instanceof ListPreference) {
-            ListPreference listPreference = (ListPreference) preference;
-            int prefIndex = listPreference.findIndexOfValue(value);
-            if (prefIndex >= 0) {
-                listPreference.setSummary(listPreference.getEntries()[prefIndex]);
-            }
-        } else if (preference instanceof EditTextPreference) {
-            preference.setSummary(value);
-        }
-    }
-
-    public boolean isUrl(String str) {
-        String regex = "http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(str);
-        return matcher.matches();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                                          String key) {
-        Preference preference = findPreference(key);
-        if (null != preference) {
-            if (!(preference instanceof CheckBoxPreference)) {
-                String value = sharedPreferences.getString(preference.getKey(), "");
-                setPreferenceSummary(preference, value);
-            }
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // create ContextThemeWrapper from the original Activity Context with the custom theme
-
-        // clone the inflater using the ContextThemeWrapper
-        inflater.getContext().setTheme(R.style.AppPreferenceSettingsFragmentTheme);
-
-        // inflate the layout using the cloned inflater, not default inflater
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
-    }
-
+    private void importSettings(){Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.setType("application/json");i.addCategory(Intent.CATEGORY_OPENABLE);startActivityForResult(i,IMPORT_CODE);}
+    @Override public void onActivityResult(int req,int result,Intent data){super.onActivityResult(req,result,data);if(result!=Activity.RESULT_OK||data==null)return;try{if(req==EXPORT_CODE){JSONObject o=new JSONObject();for(Map.Entry<String,?> e:getPreferenceManager().getSharedPreferences().getAll().entrySet()){Object v=e.getValue();if(v instanceof String||v instanceof Boolean||v instanceof Integer||v instanceof Long||v instanceof Float)o.put(e.getKey(),v);}OutputStream out=requireContext().getContentResolver().openOutputStream(data.getData());out.write(o.toString(2).getBytes("UTF-8"));out.close();Toast.makeText(requireContext(),R.string.settings_exported,Toast.LENGTH_LONG).show();}else if(req==IMPORT_CODE){InputStream in=requireContext().getContentResolver().openInputStream(data.getData());BufferedReader r=new BufferedReader(new InputStreamReader(in));StringBuilder b=new StringBuilder();String s;while((s=r.readLine())!=null)b.append(s);r.close();JSONObject o=new JSONObject(b.toString());SharedPreferences.Editor e=getPreferenceManager().getSharedPreferences().edit();java.util.Iterator<String> it=o.keys();while(it.hasNext()){String k=it.next();Object v=o.get(k);if(v instanceof Boolean)e.putBoolean(k,(Boolean)v);else if(v instanceof Integer)e.putInt(k,(Integer)v);else if(v instanceof Long)e.putLong(k,(Long)v);else if(v instanceof Double)e.putFloat(k,((Double)v).floatValue());else e.putString(k,String.valueOf(v));}e.apply();Toast.makeText(requireContext(),R.string.settings_imported,Toast.LENGTH_LONG).show();requireActivity().recreate();}}catch(Exception e){Toast.makeText(requireContext(),R.string.settings_file_error,Toast.LENGTH_LONG).show();}}
+    @Override public void onSharedPreferenceChanged(SharedPreferences p,String key){if(AppTheme.KEY_THEME.equals(key))AppTheme.apply(requireContext());}
+    @Override public void onResume(){super.onResume();getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);}
+    @Override public void onPause(){getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);super.onPause();}
 }

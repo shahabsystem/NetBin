@@ -34,6 +34,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.github.xfalcon.vhosts.NetworkReceiver;
 import com.github.xfalcon.vhosts.R;
 import com.github.xfalcon.vhosts.SettingsFragment;
+import com.github.xfalcon.vhosts.AdBlockManager;
 import com.github.xfalcon.vhosts.VhostsActivity;
 import com.github.xfalcon.vhosts.util.LogUtils;
 import org.xbill.DNS.Address;
@@ -138,7 +139,9 @@ public class VhostsService extends VpnService {
         String uri_path = settings.getString(SettingsFragment.HOSTS_URI, null);
         try {
             final InputStream inputStream;
-            if (is_net)
+            if (AdBlockManager.isEnabled(this))
+                inputStream = AdBlockManager.getEffectiveInput(this);
+            else if (is_net)
                 inputStream = openFileInput(SettingsFragment.NET_HOST_FILE);
             else
                 inputStream = getContentResolver().openInputStream(Uri.parse(uri_path));
@@ -187,12 +190,16 @@ public class VhostsService extends VpnService {
                 }
             }
 
-            LogUtils.d(TAG, "use dns:" + VPN_DNS4);
+            String VPN_DNS4_2 = settings.getString(SettingsFragment.IPV4_DNS2, "8.8.8.8");
+            try { Address.getByAddress(VPN_DNS4_2); } catch (Exception e) { VPN_DNS4_2 = "8.8.8.8"; }
+            LogUtils.d(TAG, "use dns:" + VPN_DNS4 + ", " + VPN_DNS4_2);
             builder.addRoute(VPN_DNS4, 32);
+            builder.addRoute(VPN_DNS4_2, 32);
             builder.addRoute(VPN_DNS6, 128);
 //            builder.addRoute(VPN_ROUTE,0);
 //            builder.addRoute(VPN_ROUTE6,0);
             builder.addDnsServer(VPN_DNS4);
+            builder.addDnsServer(VPN_DNS4_2);
             builder.addDnsServer(VPN_DNS6);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 String[] whiteList = {"com.android.vending", "com.google.android.apps.docs", "com.google.android.apps.photos", "com.google.android.gm", "com.google.android.apps.translate"};

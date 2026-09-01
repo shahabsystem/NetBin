@@ -104,35 +104,32 @@ public class DnsChange {
     }
 
     public static int handle_hosts(InputStream inputStream) {
-        String STR_COMMENT = "#";
-        String HOST_PATTERN_STR = "^\\s*(" + STR_COMMENT + "?)\\s*(\\S*)\\s*([^" + STR_COMMENT + "]*)" + STR_COMMENT + "?(.*)$";
-        Pattern HOST_PATTERN = Pattern.compile(HOST_PATTERN_STR);
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
             DOMAINS_IP_MAPS4 = new ConcurrentHashMap<>();
             DOMAINS_IP_MAPS6 = new ConcurrentHashMap<>();
+            String line;
             while (!Thread.interrupted() && (line = reader.readLine()) != null) {
-                if (line.length() > 1000 || line.startsWith(STR_COMMENT)) continue;
-                Matcher matcher = HOST_PATTERN.matcher(line);
-                if (matcher.find()) {
-                    String ip = matcher.group(2).trim();
-                    try {
-                        Address.getByAddress(ip);
-                    } catch (Exception e) {
-                        continue;
-                    }
-                    if (ip.contains(":")) {
-                        DOMAINS_IP_MAPS6.put(matcher.group(3).trim() + ".", ip);
-                    } else {
-                        DOMAINS_IP_MAPS4.put(matcher.group(3).trim() + ".", ip);
-                    }
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#") || line.length() > 1000) continue;
+                int comment = line.indexOf('#');
+                if (comment >= 0) line = line.substring(0, comment).trim();
+                String[] parts = line.split("\\s+");
+                if (parts.length < 2) continue;
+                String ip = parts[0].trim();
+                try { Address.getByAddress(ip); } catch (Exception ignored) { continue; }
+                for (int i = 1; i < parts.length; i++) {
+                    String domain = parts[i].trim().toLowerCase(java.util.Locale.US);
+                    if (domain.isEmpty() || domain.contains(" ")) continue;
+                    if (domain.endsWith(".")) domain = domain.substring(0, domain.length() - 1);
+                    String key = domain + ".";
+                    if (ip.contains(":")) DOMAINS_IP_MAPS6.put(key, ip);
+                    else DOMAINS_IP_MAPS4.put(key, ip);
                 }
             }
             reader.close();
             inputStream.close();
-            LogUtils.d(TAG, DOMAINS_IP_MAPS4.toString());
-            LogUtils.d(TAG, DOMAINS_IP_MAPS6.toString());
+            LogUtils.d(TAG, "hosts loaded: ipv4=" + DOMAINS_IP_MAPS4.size() + ", ipv6=" + DOMAINS_IP_MAPS6.size());
             return DOMAINS_IP_MAPS4.size() + DOMAINS_IP_MAPS6.size();
         } catch (IOException e) {
             LogUtils.d(TAG, "Hook dns error", e);
