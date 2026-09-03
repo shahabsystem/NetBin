@@ -1,17 +1,100 @@
 <resources>
- <string name="app_name">VHosts Pro</string><string name="settings_title">تنظیمات VHosts Pro</string>
- <string name="start_vpn">فعال‌سازی محافظت</string><string name="stop_vpn">محافظت خاموش</string><string name="select_hosts">انتخاب فایل Hosts</string><string name="re_select_hosts">تغییر فایل Hosts</string>
- <string name="status_running">محافظت فعال است</string><string name="status_stopped">محافظت خاموش است</string><string name="source_adblock">فیلتر تبلیغات و ردیاب‌ها فعال</string><string name="source_hosts_only">فقط Hosts سفارشی</string>
- <string name="button_settings">تنظیمات</string><string name="button_support">حمایت از توسعه</string><string name="button_boot">شروع خودکار</string><string name="boot_on">شروع خودکار: روشن</string><string name="boot_off">شروع خودکار: خاموش</string>
- <string name="dialog_title">فایل Hosts انتخاب نشده</string><string name="dialog_message">برای شروع، یک فایل Hosts انتخاب کنید یا از لیست آنلاین استفاده کنید.</string><string name="dialog_confirm">انتخاب فایل</string><string name="dialog_cancel">لغو</string>
- <string name="permission_error">دسترسی به فایل ممکن نیست.</string><string name="file_select_error">فایل‌منیجر سیستم در دسترس نیست.</string><string name="hosts_selected">فایل Hosts انتخاب شد.</string><string name="start_error">آماده‌سازی محافظت انجام نشد.</string>
- <string name="dns_server">1.1.1.1</string><string name="dns4_error">آدرس DNS معتبر نیست.</string><string name="url_error">نشانی اینترنتی معتبر نیست.</string>
- <string name="pref_cat_protection">مسدودسازی تبلیغات و ردیاب‌ها</string><string name="pref_adblock">مسدودسازی تبلیغات</string><string name="pref_adblock_summary">دامنه‌های تبلیغاتی و ردیاب‌ها قبل از اتصال فیلتر می‌شوند.</string><string name="pref_adblock_url">نشانی لیست فیلتر</string><string name="pref_adblock_url_summary">یک فایل hosts سازگار وارد کنید.</string><string name="pref_update_adblock">به‌روزرسانی لیست فیلتر</string><string name="pref_update_adblock_summary">لیست فیلتر را دانلود و در حافظه محلی ذخیره می‌کند.</string><string name="default_adblock_url">https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts</string><string name="adblock_updating">در حال دریافت لیست فیلتر…</string><string name="adblock_updated">لیست فیلتر به‌روز شد؛ %d دامنه پردازش شد.</string><string name="adblock_update_error">دریافت لیست فیلتر ناموفق بود.</string>
- <string name="pref_cat_dns">DNS سفارشی</string><string name="pref_dns_title">استفاده از DNS سفارشی</string><string name="pref_dns_custom_summary">DNS اول و دوم برای پاسخ‌گویی سریع‌تر و قابل انتخاب.</string><string name="pref_dns_primary">DNS اصلی</string><string name="pref_dns_secondary">DNS پشتیبان</string><string name="pref_dns_preset">پروفایل آماده DNS</string><string name="pref_dns_preset_summary">یک سرویس شناخته‌شده یا حالت سفارشی را انتخاب کنید.</string>
- <string name="pref_cat_hosts">منبع Hosts</string><string name="title_pref_remote_hosts">آدرس Hosts آنلاین</string><string name="pref_remote_hosts">دریافت Hosts از اینترنت</string><string name="pref_is_net">استفاده از Hosts آنلاین</string>
- <string name="pref_cat_interface">رابط و پشتیبان‌گیری</string><string name="pref_theme">تم برنامه</string><string name="pref_export">خروجی گرفتن از تنظیمات</string><string name="pref_export_summary">تنظیمات را به فایل JSON منتقل کنید.</string><string name="pref_import">وارد کردن تنظیمات</string><string name="pref_import_summary">یک فایل JSON قبلی را بازیابی کنید.</string><string name="settings_exported">تنظیمات ذخیره شد.</string><string name="settings_imported">تنظیمات بازیابی شد.</string><string name="settings_file_error">فایل تنظیمات قابل خواندن نیست.</string>
- <string name="pref_cat_about">درباره برنامه</string><string name="about_summary">VHosts Pro 3.0 — Hosts + AdBlock + Custom DNS
-بدون نیاز به Root</string>
- <string name="support_title">حمایت از توسعه‌دهنده</string><string name="support_message">اگر VHosts Pro برایتان مفید است، با ستاره دادن به پروژه، معرفی آن یا ارسال پیشنهاد به ادامه توسعه کمک کنید.</string><string name="support_github">پروفایل GitHub</string><string name="support_repo">صفحه پروژه</string><string name="support_email">ارتباط و ارسال پیشنهاد در GitHub</string><string name="support_email_subject">VHosts Pro — پیشنهاد یا گزارش مشکل</string>
- <string name="support_note">حمایت شما باعث می‌شود امکانات بیشتری مثل DoH/DoT، آمار مسدودسازی و لیست‌های بیشتر اضافه کنیم.</string>
+    <string name="app_name">DNS Eye</string>
+    <string name="action_settings">تنظیمات</string>
+    <string name="update_button">به‌روزرسانی</string>
+    <string name="update_hosts">به‌روزرسانی فهرست دامنه‌ها</string>
+    <string name="clear_hosts">پاک کردن Hosts</string>
+    <string name="load_hosts">بارگذاری Hosts</string>
+    <string name="backup_hosts">پشتیبان Hosts</string>
+    <string name="start_vpn">شروع محافظت</string>
+    <string name="stop_vpn">توقف محافظت</string>
+    <string name="re_select_hosts">انتخاب دوباره فایل Hosts</string>
+    <string name="select_hosts">انتخاب فایل Hosts</string>
+    <string name="info">پشتیبانی از رکوردهای Wildcard DNS؛ مثال: abc.com و زیر‌دامنه‌های آن.</string>
+    <string name="dialog_title">انتخاب فایل Hosts</string>
+    <string name="dialog_message">فایل Hosts انتخاب نشده یا حذف شده است.</string>
+    <string name="dialog_confirm">تأیید</string>
+    <string name="dialog_cancel">لغو</string>
+    <string name="dns_server">1.1.1.1</string>
+    <string name="file_select_error">مرورگر فایل سیستم پیدا نشد؛ حالت URL فعال می‌شود.</string>
+    <string name="permission_error">دسترسی لازم وجود ندارد.</string>
+    <string name="fab_label_setting">تنظیمات</string>
+    <string name="fab_label_boot">اجرای خودکار</string>
+    <string name="fab_label_donation">حمایت از توسعه</string>
+    <string name="welcome">اگر DNS Eye برایتان مفید است، با حمایت شما توسعه و بهبود آن ادامه پیدا می‌کند. ❤️</string>
+    <string name="rate">امتیاز دادن به برنامه</string>
+    <string name="alipay">حمایت با Alipay</string>
+    <string name="wechat">حمایت با WeChat</string>
+    <string name="paypal">حمایت با PayPal</string>
+    <string name="googleplay">حمایت از طریق Google Play</string>
+    <string name="googleplay2">حمایت ۲ دلاری</string>
+    <string name="googleplay4">حمایت ۴ دلاری</string>
+    <string name="googleplay6">حمایت ۶ دلاری</string>
+    <string name="googleplay8">حمایت ۸ دلاری</string>
+    <string name="googleplay10">حمایت ۱۰ دلاری</string>
+    <string name="bitcoin">حمایت با Bitcoin</string>
+    <string name="tip_bitcoin">آدرس Bitcoin در کلیپ‌بورد کپی شد.</string>
+    <string name="radio_local">فایل محلی</string>
+    <string name="radio_net">فایل اینترنتی</string>
+    <string name="url_error">آدرس URL صحیح نیست.</string>
+    <string name="dns4_error">آدرس DNS صحیح نیست.</string>
+    <string name="down_success">دانلود موفق بود؛ %d رکورد بارگذاری شد.</string>
+    <string name="down_error">دانلود ناموفق بود.</string>
+    <string name="runing_notice">DNS Eye در حال اجراست.</string>
+    <string name="pref_ps_set_hosts_url">منبع فهرست دامنه‌ها</string>
+    <string name="pref_ps_set_cus_dns">DNS سفارشی</string>
+    <string name="pref_ps_security">مسدودسازی تبلیغات و ردیاب‌ها</string>
+    <string name="pref_ps_backup">پشتیبان‌گیری و بازیابی</string>
+    <string name="pref_ps_appearance">ظاهر برنامه</string>
+    <string name="pref_ps_support">پشتیبانی از توسعه‌دهنده</string>
+    <string name="title_pref_remote_hosts">آدرس فهرست Hosts</string>
+    <string name="pref_remote_hosts">یک URL معتبر برای فهرست Hosts وارد کنید.</string>
+    <string name="pref_is_net">استفاده از فهرست اینترنتی</string>
+    <string name="pref_dns">DNS اصلی</string>
+    <string name="pref_dns2">DNS پشتیبان</string>
+    <string name="pref_manage_dns">مدیریت DNSها</string>
+    <string name="pref_manage_dns_summary">DNSهای آماده و DNSهای دلخواه خودتان را اضافه، انتخاب و مدیریت کنید.</string>
+    <string name="pref_auto_dns">انتخاب خودکار سریع‌ترین DNS</string>
+    <string name="pref_auto_dns_summary">هنگام اتصال، DNSها را هم‌زمان تست می‌کند و سریع‌ترین‌ها را اعمال می‌کند.</string>
+    <string name="pref_test_dns">تست سرعت DNSها</string>
+    <string name="pref_test_dns_summary">تاخیر DNSهای موجود را اندازه‌گیری و نتیجه را نمایش می‌دهد.</string>
+    <string name="dns_add">افزودن DNS</string>
+    <string name="dns_name">نام DNS</string>
+    <string name="dns_address">آدرس IPv4</string>
+    <string name="dns_added">DNS با موفقیت اضافه شد.</string>
+    <string name="dns_removed">DNS حذف شد.</string>
+    <string name="dns_selected">DNS انتخاب شد.</string>
+    <string name="dns_invalid">آدرس IPv4 معتبر نیست.</string>
+    <string name="dns_empty">هنوز DNS سفارشی اضافه نشده است.</string>
+    <string name="dns_testing">در حال تست DNSها…</string>
+    <string name="dns_fastest">سریع‌ترین DNS: %1$s — %2$d ms</string>
+    <string name="dns_no_result">هیچ DNS قابل دسترسی پیدا نشد.</string>
+    <string name="dns_manage_hint">برای انتخاب لمس کنید؛ برای حذف DNS سفارشی از دکمه حذف استفاده کنید.</string>
+    <string name="pref_dns_title">استفاده از DNS سفارشی</string>
+    <string name="download_alert">در حال دریافت فهرست…</string>
+    <string name="no_net_record">فهرست اینترنتی رکورد قابل استفاده‌ای ندارد؛ منبع را بررسی کنید.</string>
+    <string name="no_local_record">فایل محلی رکورد قابل استفاده‌ای ندارد؛ فایل را بررسی کنید.</string>
+    <string name="pref_adblock">مسدودسازی تبلیغات و Trackerها</string>
+    <string name="pref_adblock_summary">دامنه‌های تبلیغاتی و ردیاب‌های رایج را مسدود می‌کند.</string>
+    <string name="pref_adblock_url">URL فهرست مسدودسازی</string>
+    <string name="pref_adblock_url_summary">فهرست Hosts سازگار با مسدودسازی را وارد کنید.</string>
+    <string name="pref_theme">تم برنامه</string>
+    <string name="theme_system">مطابق سیستم</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تاریک</string>
+    <string name="pref_export">خروجی گرفتن از تنظیمات</string>
+    <string name="pref_import">وارد کردن تنظیمات</string>
+    <string name="pref_github">GitHub توسعه‌دهنده</string>
+    <string name="pref_email">ایمیل توسعه‌دهنده</string>
+    <string name="pref_coffee">حمایت با قهوه ☕</string>
+    <string name="pref_reymit">حمایت مالی با ری‌میت</string>
+    <string name="support_message">از توسعه DNS Eye حمایت کنید ❤️</string>
+    <string name="support_github">github.com/shahabsystem</string>
+    <string name="support_email">hamedmohammadinikche@gmail.com</string>
+    <string name="support_coffee">coffeebede.com/shahabsystem</string>
+    <string name="support_reymit">reymit.ir/shahabsystem</string>
+    <string name="export_success">تنظیمات با موفقیت ذخیره شد.</string>
+    <string name="import_success">تنظیمات با موفقیت بازیابی شد.</string>
+    <string name="import_error">فایل تنظیمات معتبر نیست.</string>
+    <string name="adblock_download">دریافت فهرست مسدودسازی</string>
 </resources>

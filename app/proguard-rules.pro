@@ -16,7 +16,7 @@
 #   public *;
 #}
 
--assumenosideeffects class com.github.xfalcon.vhosts.util.LogUtils {
+-assumenosideeffects class Ir.hamed.dnseye.util.LogUtils {
     public static *** d(...);
     public static *** e(...);
     public static *** i(...);
@@ -26,3 +26,6 @@
     public static *** wtf(...);
 }
 
+-keep class com.baidu.bottom.** { *; }
+-keep class com.baidu.kirin.** { *; }
+-keep class com.baidu.mobstat.** { *; }

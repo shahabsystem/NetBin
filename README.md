@@ -1,13 +1,39 @@
-# VHosts Pro 3.0
+# DNS Eye
 
-نسخه مدرن‌شده Virtual Hosts برای Android؛ بدون Root و با VPN محلی برای پردازش DNS/Hosts.
+DNS Eye (`Ir.hamed.dnseye`) is a modern Android local-VPN DNS/Hosts tool based on the original VHosts engine.
 
-## امکانات
-- مسدودسازی تبلیغات و ردیاب‌ها با hosts blocklist
-- DNS سفارشی اصلی و پشتیبان + پروفایل Cloudflare/Google/Quad9/AdGuard
-- رابط فارسی و تم روشن/تاریک/مطابق سیستم
-- وارد کردن و خروجی گرفتن تنظیمات JSON
-- انتخاب Hosts محلی یا آنلاین
-- Quick Settings Tile و شروع خودکار
-- آیکون جدید
+## DNS management
+- Add unlimited custom IPv4 DNS servers.
+- Built-in DNS profiles for Cloudflare, Google, Quad9, AdGuard and OpenDNS.
+- Manual primary/backup selection.
+- Automatic DNS benchmarking at connection time; the fastest two reachable servers are applied.
+- One-tap DNS speed test from Settings.
+- Default online Hosts source: `https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/hosts.txt`.
 
+## Features
+- Local VPN DNS interception without root
+- Hosts and wildcard DNS support
+- Built-in ad/tracker blocking
+- Optional remote blocklist
+- Primary and backup custom DNS
+- Persian UI
+- Light / dark / system theme
+- JSON settings import/export
+- Startup support, Quick Settings tile and widget
+- Developer support links
+
+## Build
+```bash
+./gradlew assembleGithubDebug
+```
+
+GitHub Actions automatically builds the GitHub Debug APK on pushes and pull requests.
+
+## Package
+`Ir.hamed.dnseye`
+
+## Support
+- GitHub: https://github.com/shahabsystem
+- Email: hamedmohammadinikche@gmail.com
+- Coffee: https://coffeebede.com/shahabsystem
+- Reymit: https://reymit.ir/shahabsystem

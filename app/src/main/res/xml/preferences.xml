@@ -1,26 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
- <PreferenceCategory android:title="@string/pref_cat_protection">
-  <SwitchPreferenceCompat android:key="ADBLOCK_ENABLED" android:defaultValue="true" android:title="@string/pref_adblock" android:summary="@string/pref_adblock_summary"/>
-  <EditTextPreference android:key="ADBLOCK_URL" android:defaultValue="https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" android:title="@string/pref_adblock_url" android:summary="@string/pref_adblock_url_summary" android:selectAllOnFocus="true"/>
-  <Preference android:key="UPDATE_ADBLOCK" android:title="@string/pref_update_adblock" android:summary="@string/pref_update_adblock_summary"/>
- </PreferenceCategory>
- <PreferenceCategory android:title="@string/pref_cat_dns">
-  <SwitchPreferenceCompat android:key="IS_CUS_DNS" android:defaultValue="true" android:title="@string/pref_dns_title" android:summary="@string/pref_dns_custom_summary"/>
-  <EditTextPreference android:key="IPV4_DNS" android:defaultValue="1.1.1.1" android:singleLine="true" android:title="@string/pref_dns_primary"/>
-  <EditTextPreference android:key="IPV4_DNS2" android:defaultValue="8.8.8.8" android:singleLine="true" android:title="@string/pref_dns_secondary"/>
-  <ListPreference android:key="DNS_PRESET" android:defaultValue="cloudflare" android:title="@string/pref_dns_preset" android:entries="@array/dns_names" android:entryValues="@array/dns_values" android:summary="@string/pref_dns_preset_summary"/>
- </PreferenceCategory>
- <PreferenceCategory android:title="@string/pref_cat_hosts">
-  <EditTextPreference android:key="HOSTS_URL" android:defaultValue="https://raw.githubusercontent.com/x-falcon/tools/master/hosts" android:title="@string/title_pref_remote_hosts" android:summary="@string/pref_remote_hosts" android:selectAllOnFocus="true"/>
-  <CheckBoxPreference android:key="IS_NET" android:defaultValue="false" android:title="@string/pref_is_net"/>
- </PreferenceCategory>
- <PreferenceCategory android:title="@string/pref_cat_interface">
-  <ListPreference android:key="THEME_MODE" android:defaultValue="system" android:title="@string/pref_theme" android:entries="@array/theme_names" android:entryValues="@array/theme_values"/>
-  <Preference android:key="EXPORT_SETTINGS" android:title="@string/pref_export" android:summary="@string/pref_export_summary"/>
-  <Preference android:key="IMPORT_SETTINGS" android:title="@string/pref_import" android:summary="@string/pref_import_summary"/>
- </PreferenceCategory>
- <PreferenceCategory android:title="@string/pref_cat_about">
-  <Preference android:title="@string/app_name" android:summary="@string/about_summary"/>
- </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_ps_security">
+        <CheckBoxPreference android:key="ADBLOCK_ENABLED" android:defaultValue="true"
+            android:title="@string/pref_adblock" android:summary="@string/pref_adblock_summary" />
+        <EditTextPreference android:key="ADBLOCK_URL"
+            android:defaultValue="https://raw.githubusercontent.com/AdguardTeam/AdguardSDNSFilter/master/Filters/filter.txt"
+            android:singleLine="true" android:selectAllOnFocus="true"
+            android:title="@string/pref_adblock_url" android:summary="@string/pref_adblock_url_summary" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_ps_set_hosts_url">
+        <EditTextPreference android:key="HOSTS_URL"
+            android:defaultValue="https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/hosts.txt"
+            android:selectAllOnFocus="true" android:title="@string/title_pref_remote_hosts"
+            android:summary="@string/pref_remote_hosts" />
+        <CheckBoxPreference android:key="IS_NET" android:defaultValue="true"
+            android:title="@string/pref_is_net" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_ps_set_cus_dns">
+        <CheckBoxPreference android:key="IS_CUS_DNS" android:defaultValue="true"
+            android:title="@string/pref_dns_title" />
+        <EditTextPreference android:key="IPV4_DNS" android:defaultValue="1.1.1.1"
+            android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_dns" />
+        <EditTextPreference android:key="IPV4_DNS2" android:defaultValue="9.9.9.9"
+            android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_dns2" />
+        <Preference android:key="MANAGE_DNS" android:title="@string/pref_manage_dns"
+            android:summary="@string/pref_manage_dns_summary" />
+        <CheckBoxPreference android:key="AUTO_DNS" android:defaultValue="false"
+            android:title="@string/pref_auto_dns" android:summary="@string/pref_auto_dns_summary" />
+        <Preference android:key="TEST_DNS" android:title="@string/pref_test_dns"
+            android:summary="@string/pref_test_dns_summary" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_ps_appearance">
+        <ListPreference android:key="THEME" android:defaultValue="system" android:title="@string/pref_theme"
+            android:entries="@array/theme_entries" android:entryValues="@array/theme_values" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_ps_backup">
+        <Preference android:key="EXPORT_SETTINGS" android:title="@string/pref_export" />
+        <Preference android:key="IMPORT_SETTINGS" android:title="@string/pref_import" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_ps_support">
+        <Preference android:key="SUPPORT_GITHUB" android:title="@string/pref_github" android:summary="@string/support_github" />
+        <Preference android:key="SUPPORT_EMAIL" android:title="@string/pref_email" android:summary="@string/support_email" />
+        <Preference android:key="SUPPORT_COFFEE" android:title="@string/pref_coffee" android:summary="@string/support_coffee" />
+        <Preference android:key="SUPPORT_REYMIT" android:title="@string/pref_reymit" android:summary="@string/support_reymit" />
+    </PreferenceCategory>
 </PreferenceScreen>

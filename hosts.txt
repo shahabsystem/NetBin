@@ -1,0 +1,23 @@
+# DNS Eye — Iranian advertising / tracker hosts
+#
+# این فایل را می‌توانید در مخزن GitHub خودتان کامل‌تر کنید.
+# آدرس آنلاین پیش‌فرض برنامه:
+# https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/hosts.txt
+#
+# قالب: 0.0.0.0 domain.example
+# خطوطی که با # شروع می‌شوند فقط توضیح هستند.
+#
+# منابع/شبکه‌های تبلیغاتی ایرانی برای بررسی و تکمیل دستی:
+# https://yektanet.com/
+# https://adivery.com/
+# https://sabavision.com/
+#
+# نمونه دامنه‌های تبلیغاتی/ردیابی — قبل از توسعه فهرست، دامنه‌ها را بررسی کنید.
+0.0.0.0 api.yektanet.com
+0.0.0.0 cdn.yektanet.com
+0.0.0.0 api.adivery.com
+0.0.0.0 adivery.com
+0.0.0.0 ad.sabavision.com
+0.0.0.0 ads.sabavision.com
+
+# --- دامنه‌های خودتان را از اینجا اضافه کنید ---
