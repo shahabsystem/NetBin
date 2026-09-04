@@ -4,14 +4,19 @@
 # قالب: 0.0.0.0 domain.example
 # خطوطی که با # شروع می‌شوند فقط توضیح هستند.
 #
-#
-0.0.0.0 api.yektanet.com
-0.0.0.0 cdn.yektanet.com
-0.0.0.0 api.adivery.com
-0.0.0.0 adivery.com
-0.0.0.0 ad.sabavision.com
-0.0.0.0 api.mediaad.org
-0.0.0.0 beta.kaprila.com
+127.0.0.1 api.yektanet.com
+127.0.0.1 cdn.yektanet.com
+127.0.0.1 api.adivery.com
+127.0.0.1 adivery.com
+127.0.0.1 ad.sabavision.com
+127.0.0.1 api.mediaad.org
+127.0.0.1 beta.kaprila.com
+127.0.0.1 plus.sabavision.com
+127.0.0.1
+
+
+
+
 
 
 
