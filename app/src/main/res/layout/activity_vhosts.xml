@@ -48,7 +48,7 @@
     <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/fab_menu"
             android:layout_width="wrap_content"
-            android:layout_height="216dp"
+            android:layout_height="144dp"
             app:menu_labels_ellipsize="end"
             app:menu_labels_singleLine="true"
             app:menu_colorNormal="@color/primary"
@@ -75,13 +75,5 @@
                 android:src="@drawable/startup"
                 app:fab_label="@string/fab_label_boot"/>
 
-        <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_donation"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/approve"
-                app:fab_colorNormal="@color/fab_yellowNormal"
-                app:fab_colorPressed="@color/fb_yellowPressed"
-                app:fab_label="@string/fab_label_donation"/>
     </com.github.clans.fab.FloatingActionMenu>
 </androidx.constraintlayout.widget.ConstraintLayout>

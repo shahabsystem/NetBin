@@ -2,7 +2,6 @@ package Ir.hamed.dnseye;
 
 import android.content.SharedPreferences;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import Ir.hamed.dnseye.vservice.VhostsService;
 
 import java.io.IOException;
@@ -32,7 +31,23 @@ public final class DnsBenchmark {
 
     public static List<String> getCandidateServers(SharedPreferences prefs) {
         List<String> servers = new ArrayList<>();
-        Collections.addAll(servers, "1.1.1.1", "8.8.8.8", "9.9.9.9", "94.140.14.14", "208.67.222.222");
+        Collections.addAll(servers,
+                // DNSهای ایرانی / مناسب شبکه‌های ایران
+                "178.22.122.100", "185.51.200.2",       // شکن
+                "78.157.42.100", "78.157.42.101",       // الکترو
+                "10.202.10.10", "10.202.10.11",        // رادار گیم
+                "185.55.226.26", "185.55.225.25",       // بگذر
+                "10.202.10.202", "10.202.10.102",       // 403.online
+                "10.202.10.11", "10.202.10.10",
+                // DNSهای عمومی برای مقایسه و پشتیبان
+                "1.1.1.1", "1.0.0.1",                  // Cloudflare
+                "8.8.8.8", "8.8.4.4",                  // Google
+                "9.9.9.9", "149.112.112.112",           // Quad9
+                "94.140.14.14", "94.140.15.15",         // AdGuard
+                "208.67.222.222", "208.67.220.220",      // OpenDNS
+                "185.228.168.9", "185.228.169.9",        // CleanBrowsing
+                "76.76.2.0", "76.76.10.0",               // Control D
+                "64.6.64.6", "64.6.65.6");              // Verisign
         try {
             JSONArray arr = new JSONArray(prefs.getString(SettingsFragment.CUSTOM_DNS_LIST, "[]"));
             for (int i = 0; i < arr.length(); i++) {
