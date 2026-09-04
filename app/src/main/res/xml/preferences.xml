@@ -10,7 +10,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_ps_set_hosts_url">
         <EditTextPreference android:key="HOSTS_URL"
-            android:defaultValue="https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/hosts.txt"
+            android:defaultValue="https://raw.githubusercontent.com/shahabsystem/netbin/main/hosts.txt"
             android:selectAllOnFocus="true" android:title="@string/title_pref_remote_hosts"
             android:summary="@string/pref_remote_hosts" />
         <CheckBoxPreference android:key="IS_NET" android:defaultValue="true"
@@ -34,7 +34,7 @@
             android:summary="@string/pref_dns_timeout_summary" android:inputType="number" />
         <Preference android:key="TEST_DNS" android:title="@string/pref_test_dns"
             android:summary="@string/pref_test_dns_summary" />
-        <EditTextPreference android:key="DNS_LIST_URL" android:defaultValue="https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/app/src/main/res/raw/dns_list.txt"
+        <EditTextPreference android:key="DNS_LIST_URL" android:defaultValue="https://raw.githubusercontent.com/shahabsystem/netbin/main/app/src/main/res/raw/dns_list.txt"
             android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_dns_list_url"
             android:summary="@string/pref_dns_list_url_summary" />
         <Preference android:key="LOAD_DNS_URL" android:title="@string/pref_load_dns_url"
@@ -48,7 +48,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_ps_backup">
         <EditTextPreference android:key="SETTINGS_URL"
-            android:defaultValue="https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/netbin-settings.json"
+            android:defaultValue="https://raw.githubusercontent.com/shahabsystem/netbin/main/netbin-settings.json"
             android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_settings_url"
             android:summary="@string/pref_settings_url_summary" />
         <Preference android:key="LOAD_SETTINGS_URL" android:title="@string/pref_load_settings_url"
