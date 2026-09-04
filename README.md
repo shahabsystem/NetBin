@@ -1,6 +1,6 @@
-# DNS Eye
+# NETBIN
 
-DNS Eye (`Ir.hamed.dnseye`) is a modern Android local-VPN DNS/Hosts tool based on the original VHosts engine.
+NETBIN (`Ir.hamed.dnseye`) is a modern Android local-VPN DNS/Hosts tool based on the original VHosts engine.
 
 ## DNS management
 - Add unlimited custom IPv4 DNS servers.

@@ -4,7 +4,7 @@
         <CheckBoxPreference android:key="ADBLOCK_ENABLED" android:defaultValue="true"
             android:title="@string/pref_adblock" android:summary="@string/pref_adblock_summary" />
         <EditTextPreference android:key="ADBLOCK_URL"
-            android:defaultValue="https://raw.githubusercontent.com/AdguardTeam/AdguardSDNSFilter/master/Filters/filter.txt"
+            android:defaultValue="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
             android:singleLine="true" android:selectAllOnFocus="true"
             android:title="@string/pref_adblock_url" android:summary="@string/pref_adblock_url_summary" />
     </PreferenceCategory>
@@ -27,14 +27,32 @@
             android:summary="@string/pref_manage_dns_summary" />
         <CheckBoxPreference android:key="AUTO_DNS" android:defaultValue="false"
             android:title="@string/pref_auto_dns" android:summary="@string/pref_auto_dns_summary" />
+        <CheckBoxPreference android:key="DNS_ONLY_BUNDLED" android:defaultValue="false"
+            android:title="@string/pref_dns_only_bundled" android:summary="@string/pref_dns_only_bundled_summary" />
+        <EditTextPreference android:key="DNS_TEST_TIMEOUT" android:defaultValue="1200"
+            android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_dns_timeout"
+            android:summary="@string/pref_dns_timeout_summary" android:inputType="number" />
         <Preference android:key="TEST_DNS" android:title="@string/pref_test_dns"
             android:summary="@string/pref_test_dns_summary" />
+        <EditTextPreference android:key="DNS_LIST_URL" android:defaultValue="https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/app/src/main/res/raw/dns_list.txt"
+            android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_dns_list_url"
+            android:summary="@string/pref_dns_list_url_summary" />
+        <Preference android:key="LOAD_DNS_URL" android:title="@string/pref_load_dns_url"
+            android:summary="@string/pref_load_dns_url_summary" />
+        <Preference android:key="RESET_DNS" android:title="@string/pref_reset_dns"
+            android:summary="@string/pref_reset_dns_summary" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_ps_appearance">
         <ListPreference android:key="THEME" android:defaultValue="system" android:title="@string/pref_theme"
             android:entries="@array/theme_entries" android:entryValues="@array/theme_values" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_ps_backup">
+        <EditTextPreference android:key="SETTINGS_URL"
+            android:defaultValue="https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/netbin-settings.json"
+            android:singleLine="true" android:selectAllOnFocus="true" android:title="@string/pref_settings_url"
+            android:summary="@string/pref_settings_url_summary" />
+        <Preference android:key="LOAD_SETTINGS_URL" android:title="@string/pref_load_settings_url"
+            android:summary="@string/pref_load_settings_url_summary" />
         <Preference android:key="EXPORT_SETTINGS" android:title="@string/pref_export" />
         <Preference android:key="IMPORT_SETTINGS" android:title="@string/pref_import" />
     </PreferenceCategory>

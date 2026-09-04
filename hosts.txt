@@ -1,4 +1,4 @@
-# DNS Eye — Iranian advertising / tracker hosts
+# NETBIN — Iranian advertising / tracker hosts
 #
 # این فایل را می‌توانید در مخزن GitHub خودتان کامل‌تر کنید.
 # آدرس آنلاین پیش‌فرض برنامه:

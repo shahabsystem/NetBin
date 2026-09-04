@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DNS Eye</string>
+    <string name="app_name">NETBIN</string>
     <string name="action_settings">تنظیمات</string>
     <string name="update_button">به‌روزرسانی</string>
     <string name="update_hosts">به‌روزرسانی فهرست دامنه‌ها</string>
@@ -21,7 +21,7 @@
     <string name="fab_label_setting">تنظیمات</string>
     <string name="fab_label_boot">اجرای خودکار</string>
     <string name="fab_label_donation">حمایت از توسعه</string>
-    <string name="welcome">اگر DNS Eye برایتان مفید است، با حمایت شما توسعه و بهبود آن ادامه پیدا می‌کند. ❤️</string>
+    <string name="welcome">اگر NETBIN برایتان مفید است، با حمایت شما توسعه و بهبود آن ادامه پیدا می‌کند. ❤️</string>
     <string name="rate">امتیاز دادن به برنامه</string>
     <string name="alipay">حمایت با Alipay</string>
     <string name="wechat">حمایت با WeChat</string>
@@ -40,7 +40,7 @@
     <string name="dns4_error">آدرس DNS صحیح نیست.</string>
     <string name="down_success">دانلود موفق بود؛ %d رکورد بارگذاری شد.</string>
     <string name="down_error">دانلود ناموفق بود.</string>
-    <string name="runing_notice">DNS Eye در حال اجراست.</string>
+    <string name="runing_notice">NETBIN در حال اجراست.</string>
     <string name="pref_ps_set_hosts_url">منبع فهرست دامنه‌ها</string>
     <string name="pref_ps_set_cus_dns">DNS سفارشی</string>
     <string name="pref_ps_security">مسدودسازی تبلیغات و ردیاب‌ها</string>
@@ -88,7 +88,7 @@
     <string name="pref_email">ایمیل توسعه‌دهنده</string>
     <string name="pref_coffee">حمایت با قهوه ☕</string>
     <string name="pref_reymit">حمایت مالی با ری‌میت</string>
-    <string name="support_message">از توسعه DNS Eye حمایت کنید ❤️</string>
+    <string name="support_message">از توسعه NETBIN حمایت کنید ❤️</string>
     <string name="support_github">github.com/shahabsystem</string>
     <string name="support_email">hamedmohammadinikche@gmail.com</string>
     <string name="support_coffee">coffeebede.com/shahabsystem</string>
@@ -96,5 +96,22 @@
     <string name="export_success">تنظیمات با موفقیت ذخیره شد.</string>
     <string name="import_success">تنظیمات با موفقیت بازیابی شد.</string>
     <string name="import_error">فایل تنظیمات معتبر نیست.</string>
+    <string name="pref_dns_only_bundled">فقط DNSهای فهرست NETBIN</string>
+    <string name="pref_dns_only_bundled_summary">در تست سرعت فقط DNSهای فایل داخلی/بارگذاری‌شده بررسی می‌شوند.</string>
+    <string name="pref_dns_timeout">مهلت تست DNS (میلی‌ثانیه)</string>
+    <string name="pref_dns_timeout_summary">مقدار پیشنهادی ۱۲۰۰ میلی‌ثانیه است.</string>
+    <string name="pref_dns_list_url">آدرس فهرست DNS آنلاین</string>
+    <string name="pref_dns_list_url_summary">URL فهرست DNS برای ذخیره و به‌روزرسانی آنلاین.</string>
+    <string name="pref_load_dns_url">بارگذاری فهرست DNS از لینک</string>
+    <string name="pref_load_dns_url_summary">فهرست DNS موجود در لینک را دریافت می‌کند.</string>
+    <string name="pref_reset_dns">بازنشانی تنظیمات DNS</string>
+    <string name="pref_reset_dns_summary">DNSهای سفارشی و حالت خودکار را به مقدار پیش‌فرض برمی‌گرداند.</string>
+    <string name="dns_reset">تنظیمات DNS بازنشانی شد.</string>
+    <string name="dns_list_loaded">فهرست DNS از لینک دریافت و ذخیره شد.</string>
+    <string name="pref_settings_url">آدرس تنظیمات آنلاین</string>
+    <string name="pref_settings_url_summary">لینک فایل JSON تنظیمات NETBIN.</string>
+    <string name="pref_load_settings_url">بارگذاری تنظیمات از لینک</string>
+    <string name="pref_load_settings_url_summary">تنظیمات JSON را از لینک دریافت و روی برنامه اعمال می‌کند.</string>
+    <string name="remote_settings_loaded">تنظیمات آنلاین بارگذاری شد.</string>
     <string name="adblock_download">دریافت فهرست مسدودسازی</string>
 </resources>

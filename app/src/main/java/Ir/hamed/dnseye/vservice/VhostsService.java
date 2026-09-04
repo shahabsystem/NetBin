@@ -199,8 +199,10 @@ public class VhostsService extends VpnService {
             // applies the two fastest reachable servers for this VPN session.
             if (settings.getBoolean(SettingsFragment.AUTO_DNS, false)) {
                 try {
+                    int dnsTimeout = 1200;
+                    try { dnsTimeout = Math.max(300, Math.min(5000, Integer.parseInt(settings.getString(SettingsFragment.DNS_TEST_TIMEOUT, "1200")))); } catch (Exception ignored) {}
                     List<DnsBenchmark.Result> results = DnsBenchmark.test(
-                            DnsBenchmark.getCandidateServers(settings), 1200);
+                            DnsBenchmark.getCandidateServers(VhostsService.this, settings), dnsTimeout);
                     if (!results.isEmpty()) {
                         VPN_DNS4 = results.get(0).server;
                         VPN_DNS4_2 = results.size() > 1 ? results.get(1).server : results.get(0).server;

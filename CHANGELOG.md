@@ -1,4 +1,13 @@
-# DNS Eye 3.1.0
+# NETBIN 3.2.0
+
+- تغییر نام نمایشی برنامه به NETBIN
+- استفاده از AdAway hosts برای Tracker/تبلیغات
+- بازنویسی فهرست DNS بر اساس DNS.TXT پیوست‌شده با ۵۲ سرویس
+- مدیریت، تست سرعت، DNS خودکار، مهلت تست، بازنشانی و بارگذاری آنلاین فهرست DNS
+- بارگذاری تنظیمات JSON از لینک
+- اصلاح اعمال تم روشن/تاریک هنگام تغییر تنظیمات
+
+# NETBIN 3.1.0
 
 - Added custom DNS manager with unlimited user-defined IPv4 DNS entries.
 - Added automatic DNS latency benchmark and fastest-two selection.
@@ -6,7 +15,7 @@
 - Added repository-hosted `hosts.txt` with starter Iranian advertising/tracker entries and source comments.
 - Default online Hosts URL now points to `shahabsystem/VhostchizPn/main/hosts.txt`.
 
-# DNS Eye 3.0.0
+# NETBIN 3.0.0
 
 - Changed application ID/package to `Ir.hamed.dnseye`.
 - Added Persian-first interface.
@@ -17,5 +26,5 @@
 - Added JSON settings import/export.
 - Removed Firebase Analytics from the GitHub build.
 - Updated GitHub Actions to setup-java v5 and Gradle 8.13.
-- Added modern DNS Eye application icon.
+- Added modern NETBIN application icon.
 - Customized developer support links.

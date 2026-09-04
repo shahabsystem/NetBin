@@ -21,7 +21,6 @@ package Ir.hamed.dnseye;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -67,6 +66,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String ADBLOCK_URL = "ADBLOCK_URL";
     public static final String CUSTOM_DNS_LIST = "CUSTOM_DNS_LIST";
     public static final String AUTO_DNS = "AUTO_DNS";
+    public static final String DNS_TEST_TIMEOUT = "DNS_TEST_TIMEOUT";
+    public static final String DNS_ONLY_BUNDLED = "DNS_ONLY_BUNDLED";
+    public static final String DNS_LIST_URL = "DNS_LIST_URL";
+    public static final String SETTINGS_URL = "SETTINGS_URL";
 
     private Handler handler = null;
 
@@ -133,6 +136,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             catch (Exception e) { Toast.makeText(preference.getContext(), R.string.dns4_error, Toast.LENGTH_LONG).show(); return false; }
         });
 
+        Preference dnsListUrl = findPreference(DNS_LIST_URL);
+        dnsListUrl.setOnPreferenceChangeListener((preference, newValue) -> {
+            String url = String.valueOf(newValue).trim();
+            if (!url.isEmpty() && !isUrl(url)) { Toast.makeText(preference.getContext(), R.string.url_error, Toast.LENGTH_LONG).show(); return false; }
+            return true;
+        });
+        Preference settingsUrl = findPreference(SETTINGS_URL);
+        settingsUrl.setOnPreferenceChangeListener((preference, newValue) -> {
+            String url = String.valueOf(newValue).trim();
+            if (!isUrl(url)) { Toast.makeText(preference.getContext(), R.string.url_error, Toast.LENGTH_LONG).show(); return false; }
+            return true;
+        });
+
         Preference adblockUrl = findPreference(ADBLOCK_URL);
         adblockUrl.setOnPreferenceChangeListener((preference, newValue) -> {
             String url=(String)newValue;
@@ -144,6 +160,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         Preference manageDns = findPreference("MANAGE_DNS");
         manageDns.setOnPreferenceClickListener(p -> { showDnsManager(); return true; });
         findPreference("TEST_DNS").setOnPreferenceClickListener(p -> { testDnsFromSettings(); return true; });
+        findPreference("LOAD_DNS_URL").setOnPreferenceClickListener(p -> { loadDnsListFromUrl(); return true; });
+        findPreference("RESET_DNS").setOnPreferenceClickListener(p -> { resetDnsSettings(); return true; });
+        findPreference("LOAD_SETTINGS_URL").setOnPreferenceClickListener(p -> { loadSettingsFromUrl(); return true; });
         findPreference("EXPORT_SETTINGS").setOnPreferenceClickListener(p -> { exportSettings(); return true; });
         findPreference("IMPORT_SETTINGS").setOnPreferenceClickListener(p -> { importSettings(); return true; });
         findPreference("SUPPORT_GITHUB").setOnPreferenceClickListener(p -> { openSupportUrl("https://github.com/shahabsystem"); return true; });
@@ -168,11 +187,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     }
 
 
-    private static final String[] BUILTIN_DNS = {
-            "Cloudflare|1.1.1.1", "Google|8.8.8.8", "Quad9|9.9.9.9",
-            "AdGuard|94.140.14.14", "OpenDNS|208.67.222.222"
-    };
-
     private JSONArray getCustomDns() {
         try { return new JSONArray(getPreferenceScreen().getSharedPreferences().getString(CUSTOM_DNS_LIST, "[]")); }
         catch (Exception e) { return new JSONArray(); }
@@ -190,18 +204,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         final android.widget.RadioGroup group = new android.widget.RadioGroup(requireContext());
         group.setOrientation(android.widget.RadioGroup.VERTICAL);
         String active = prefs.getString(IPV4_DNS, "1.1.1.1");
-        for (String item : BUILTIN_DNS) addDnsRow(group, item.split("\\|", 2)[0], item.split("\\|", 2)[1], active, false);
+        for (DnsListRepository.Entry item : DnsListRepository.load(requireContext()))
+            addDnsRow(group, item.name, item.primary, item.secondary, active, false);
         JSONArray custom = getCustomDns();
         for (int i = 0; i < custom.length(); i++) {
             try {
                 JSONObject o = custom.getJSONObject(i);
-                addDnsRow(group, o.optString("name", "سفارشی"), o.getString("ip"), active, true);
+                addDnsRow(group, o.optString("name", "سفارشی"), o.getString("ip"), "", active, true);
             } catch (Exception ignored) {}
         }
         list.addView(group);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(requireContext());
+        scroll.addView(list);
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.pref_manage_dns)
-                .setView(list)
+                .setView(scroll)
                 .setPositiveButton(R.string.dns_add, null)
                 .setNegativeButton(R.string.dialog_cancel, null)
                 .create();
@@ -209,26 +226,30 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         dialog.show();
     }
 
-    private void addDnsRow(android.widget.RadioGroup group, String name, String ip, String active, boolean removable) {
+    private void addDnsRow(android.widget.RadioGroup group, String name, String primary, String secondary, String active, boolean removable) {
         LinearLayout row = new LinearLayout(requireContext());
         row.setGravity(Gravity.CENTER_VERTICAL);
         android.widget.RadioButton rb = new android.widget.RadioButton(requireContext());
-        rb.setText(name + "  •  " + ip);
-        rb.setTextSize(16);
-        rb.setChecked(ip.equals(active));
+        String label = name + "  •  " + primary + (secondary.isEmpty() ? "" : " / " + secondary);
+        rb.setText(label);
+        rb.setTextSize(15);
+        rb.setChecked(primary.equals(active));
         row.addView(rb, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         if (removable) {
             android.widget.Button del = new android.widget.Button(requireContext());
             del.setText("×");
             del.setMinWidth(48);
-            del.setOnClickListener(v -> { removeCustomDns(ip); showDnsManager(); });
+            del.setOnClickListener(v -> { removeCustomDns(primary); showDnsManager(); });
             row.addView(del, new LinearLayout.LayoutParams(56, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         rb.setOnClickListener(v -> {
             SharedPreferences.Editor e = getPreferenceScreen().getSharedPreferences().edit();
-            e.putString(IPV4_DNS, ip).putBoolean(IS_CUS_DNS, true).apply();
+            e.putString(IPV4_DNS, primary).putString(IPV4_DNS2, secondary.isEmpty() ? primary : secondary)
+                    .putBoolean(IS_CUS_DNS, true).apply();
             Preference p = findPreference(IPV4_DNS);
-            if (p != null) p.setSummary(ip);
+            Preference p2 = findPreference(IPV4_DNS2);
+            if (p != null) p.setSummary(primary);
+            if (p2 != null) p2.setSummary(secondary.isEmpty() ? primary : secondary);
             Toast.makeText(requireContext(), R.string.dns_selected, Toast.LENGTH_SHORT).show();
         });
         group.addView(row);
@@ -256,8 +277,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                     try { o.put("name", name.getText().toString().trim().isEmpty() ? "DNS سفارشی" : name.getText().toString().trim()); o.put("ip", address); arr.put(o); } catch(Exception ignored){}
                     getPreferenceScreen().getSharedPreferences().edit().putString(CUSTOM_DNS_LIST, arr.toString()).apply();
                     Toast.makeText(requireContext(), R.string.dns_added, Toast.LENGTH_SHORT).show();
-                    parent.dismiss();
-                    showDnsManager();
+                    parent.dismiss(); showDnsManager();
                 }).setNegativeButton(R.string.dialog_cancel, null).show();
     }
 
@@ -268,12 +288,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         Toast.makeText(requireContext(), R.string.dns_removed, Toast.LENGTH_SHORT).show();
     }
 
+    private void resetDnsSettings() {
+        getPreferenceScreen().getSharedPreferences().edit()
+                .remove(CUSTOM_DNS_LIST).putBoolean(AUTO_DNS, false).putBoolean(DNS_ONLY_BUNDLED, false)
+                .putString(IPV4_DNS, "1.1.1.1").putString(IPV4_DNS2, "9.9.9.9").apply();
+        handeleSummary(getPreferenceScreen(), getPreferenceScreen().getSharedPreferences());
+        Toast.makeText(requireContext(), R.string.dns_reset, Toast.LENGTH_SHORT).show();
+    }
+
     private void testDnsFromSettings() {
         final Preference test = findPreference("TEST_DNS");
         if (test != null) test.setSummary(R.string.dns_testing);
         new Thread(() -> {
-            List<String> servers = DnsBenchmark.getCandidateServers(getPreferenceScreen().getSharedPreferences());
-            java.util.List<DnsBenchmark.Result> results = DnsBenchmark.test(servers, 1200);
+            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            List<String> servers = DnsBenchmark.getCandidateServers(requireContext(), prefs);
+            int timeout = 1200;
+            try { timeout = Math.max(300, Math.min(5000, Integer.parseInt(prefs.getString(DNS_TEST_TIMEOUT, "1200")))); } catch (Exception ignored) {}
+            java.util.List<DnsBenchmark.Result> results = DnsBenchmark.test(servers, timeout);
             requireActivity().runOnUiThread(() -> {
                 if (test == null) return;
                 if (results.isEmpty()) { test.setSummary(R.string.dns_no_result); return; }
@@ -284,6 +315,49 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }).start();
     }
 
+    private void loadDnsListFromUrl() {
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        String url = prefs.getString(DNS_LIST_URL, "").trim();
+        if (!isUrl(url)) { Toast.makeText(requireContext(), R.string.url_error, Toast.LENGTH_LONG).show(); return; }
+        new Thread(() -> {
+            try {
+                String result = HttpUtils.get(url);
+                FileUtils.writeFile(requireContext().openFileOutput("dns_list_remote.txt", Context.MODE_PRIVATE), result);
+                requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.dns_list_loaded, Toast.LENGTH_LONG).show());
+            } catch (Exception e) {
+                LogUtils.e(TAG, "load DNS list", e);
+                requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.down_error, Toast.LENGTH_LONG).show());
+            }
+        }).start();
+    }
+
+    private void loadSettingsFromUrl() {
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        String url = prefs.getString(SETTINGS_URL, "").trim();
+        if (!isUrl(url)) { Toast.makeText(requireContext(), R.string.url_error, Toast.LENGTH_LONG).show(); return; }
+        new Thread(() -> {
+            try {
+                String result = HttpUtils.get(url);
+                JSONObject root = new JSONObject(result);
+                SharedPreferences.Editor editor = prefs.edit();
+                java.util.Iterator<String> keys = root.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next(); if ("format".equals(key)) continue;
+                    Object value = root.get(key);
+                    if (value instanceof Boolean) editor.putBoolean(key, (Boolean)value);
+                    else if (value instanceof Integer) editor.putInt(key, (Integer)value);
+                    else if (value instanceof Long) editor.putLong(key, (Long)value);
+                    else if (value instanceof Number) editor.putString(key, String.valueOf(value));
+                    else if (value instanceof String) editor.putString(key, (String)value);
+                }
+                editor.apply();
+                requireActivity().runOnUiThread(() -> { Toast.makeText(requireContext(), R.string.remote_settings_loaded, Toast.LENGTH_LONG).show(); ThemeUtils.apply(requireContext()); requireActivity().recreate(); });
+            } catch (Exception e) {
+                LogUtils.e(TAG, "load remote settings", e);
+                requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.import_error, Toast.LENGTH_LONG).show());
+            }
+        }).start();
+    }
     private void openSupportUrl(String url) {
         try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
         catch (Exception e) { Toast.makeText(requireContext(), url, Toast.LENGTH_LONG).show(); }
@@ -292,7 +366,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private void exportSettings() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.setType("application/json");
-        intent.putExtra(Intent.EXTRA_TITLE, "dnseye-settings.json");
+        intent.putExtra(Intent.EXTRA_TITLE, "netbin-settings.json");
         startActivityForResult(intent, 1001);
     }
 
@@ -376,8 +450,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         llParam.gravity = Gravity.CENTER;
         TextView tvText = new TextView(context);
         tvText.setText(getString(R.string.download_alert));
-        tvText.setTextColor(Color.parseColor("#000000"));
-        tvText.setTextSize(20);
+                tvText.setTextSize(20);
         tvText.setLayoutParams(llParam);
 
         ll.addView(progressBar);
@@ -462,6 +535,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
         Preference preference = findPreference(key);
+        if ("THEME".equals(key)) {
+            ThemeUtils.apply(requireContext());
+            requireActivity().recreate();
+            return;
+        }
         if (null != preference) {
             if (!(preference instanceof CheckBoxPreference)) {
                 String value = sharedPreferences.getString(preference.getKey(), "");
