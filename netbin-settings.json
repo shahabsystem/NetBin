@@ -10,6 +10,6 @@
   "AUTO_DNS": false,
   "DNS_ONLY_BUNDLED": false,
   "DNS_TEST_TIMEOUT": "1200",
-  "DNS_LIST_URL": "https://raw.githubusercontent.com/shahabsystem/netbin/main/app/src/main/res/raw/dns_list.txt",
-  "THEME": "system"
+  "DNS_LIST_URL": "https://raw.githubusercontent.com/shahabsystem/netbin/main/DNS.TXT",
+  "THEME": "dark"
 }
