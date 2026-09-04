@@ -2,7 +2,7 @@
   "format": 2,
   "ADBLOCK_ENABLED": true,
   "ADBLOCK_URL": "https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt",
-  "HOSTS_URL": "https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/hosts.txt",
+  "HOSTS_URL": "https://raw.githubusercontent.com/shahabsystem/netbin/main/hosts.txt",
   "IS_NET": true,
   "IS_CUS_DNS": true,
   "IPV4_DNS": "1.1.1.1",
@@ -10,6 +10,6 @@
   "AUTO_DNS": false,
   "DNS_ONLY_BUNDLED": false,
   "DNS_TEST_TIMEOUT": "1200",
-  "DNS_LIST_URL": "https://raw.githubusercontent.com/shahabsystem/VhostchizPn/main/app/src/main/res/raw/dns_list.txt",
+  "DNS_LIST_URL": "https://raw.githubusercontent.com/shahabsystem/netbin/main/app/src/main/res/raw/dns_list.txt",
   "THEME": "system"
 }
