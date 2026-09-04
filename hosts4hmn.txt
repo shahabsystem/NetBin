@@ -3240,13 +3240,13 @@
 127.0.0.1 zzxbn.com
 127.0.0.1 localhost
 127.0.0.1 www.a.com
-0.0.0.0 api.yektanet.com
-0.0.0.0 cdn.yektanet.com
-0.0.0.0 api.adivery.com
-0.0.0.0 adivery.com
-0.0.0.0 ad.sabavision.com
-0.0.0.0 api.mediaad.org
-0.0.0.0 beta.kaprila.com
+127.0.0.1 api.yektanet.com
+127.0.0.1 cdn.yektanet.com
+127.0.0.1 api.adivery.com
+127.0.0.1 adivery.com
+127.0.0.1 ad.sabavision.com
+127.0.0.1 api.mediaad.org
+127.0.0.1 beta.kaprila.com
 
 
 
