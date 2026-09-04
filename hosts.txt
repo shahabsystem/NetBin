@@ -18,6 +18,8 @@
 0.0.0.0 api.adivery.com
 0.0.0.0 adivery.com
 0.0.0.0 ad.sabavision.com
-0.0.0.0 ads.sabavision.com
+0.0.0.0 api.mediaad.org
+0.0.0.0 beta.kaprila.com
+
 
 # --- دامنه‌های خودتان را از اینجا اضافه کنید ---
