@@ -13,7 +13,7 @@
 127.0.0.1 beta.kaprila.com
 127.0.0.1 plus.sabavision.com
 127.0.0.1 event.yektanet.com
-
+127.0.0.1 tapsell.ir
 
 
 
