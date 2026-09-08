@@ -14,6 +14,7 @@
 127.0.0.1 plus.sabavision.com
 127.0.0.1 event.yektanet.com
 127.0.0.1 tapsell.ir
+127.0.0.1 smoothie.tavoos.net
 
 
 
