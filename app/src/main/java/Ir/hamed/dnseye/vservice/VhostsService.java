@@ -282,7 +282,7 @@ public class VhostsService extends VpnService {
         if (now - lastTrafficPersist >= 5000) persistTraffic(context);
     }
 
-    private synchronized void persistTraffic(Context context) {
+    private static synchronized void persistTraffic(Context context) {
         lastTrafficPersist = System.currentTimeMillis();
         androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putLong(TOTAL_UP, totalUploaded.get())
