@@ -28,6 +28,9 @@ import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ScrollView;
+import android.graphics.Typeface;
+import android.view.Gravity;
 import android.content.Intent;
 import android.net.Uri;
 import java.io.InputStream;
@@ -41,6 +44,7 @@ import Ir.hamed.dnseye.util.FileUtils;
 import Ir.hamed.dnseye.util.HttpUtils;
 import Ir.hamed.dnseye.util.LogUtils;
 import Ir.hamed.dnseye.vservice.DnsChange;
+import Ir.hamed.dnseye.vservice.VhostsService;
 import org.xbill.DNS.Address;
 
 import java.util.List;
@@ -163,6 +167,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         findPreference("LOAD_DNS_URL").setOnPreferenceClickListener(p -> { loadDnsListFromUrl(); return true; });
         findPreference("RESET_DNS").setOnPreferenceClickListener(p -> { resetDnsSettings(); return true; });
         findPreference("LOAD_SETTINGS_URL").setOnPreferenceClickListener(p -> { loadSettingsFromUrl(); return true; });
+        findPreference("TRAFFIC_USAGE").setOnPreferenceClickListener(p -> { showTrafficUsage(); return true; });
+        findPreference("RESET_TRAFFIC").setOnPreferenceClickListener(p -> { VhostsService.resetTraffic(requireContext()); Toast.makeText(requireContext(), R.string.traffic_reset, Toast.LENGTH_SHORT).show(); return true; });
         findPreference("EXPORT_SETTINGS").setOnPreferenceClickListener(p -> { exportSettings(); return true; });
         findPreference("IMPORT_SETTINGS").setOnPreferenceClickListener(p -> { importSettings(); return true; });
         findPreference("SUPPORT_GITHUB").setOnPreferenceClickListener(p -> { openSupportUrl("https://github.com/shahabsystem"); return true; });
@@ -302,17 +308,83 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         new Thread(() -> {
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             List<String> servers = DnsBenchmark.getCandidateServers(requireContext(), prefs);
-            int timeout = 1200;
-            try { timeout = Math.max(300, Math.min(5000, Integer.parseInt(prefs.getString(DNS_TEST_TIMEOUT, "1200")))); } catch (Exception ignored) {}
+            int timeoutValue = 1200;
+            try { timeoutValue = Math.max(300, Math.min(5000, Integer.parseInt(prefs.getString(DNS_TEST_TIMEOUT, "1200")))); } catch (Exception ignored) {}
+            final int timeout = timeoutValue;
             java.util.List<DnsBenchmark.Result> results = DnsBenchmark.test(servers, timeout);
             requireActivity().runOnUiThread(() -> {
-                if (test == null) return;
-                if (results.isEmpty()) { test.setSummary(R.string.dns_no_result); return; }
-                DnsBenchmark.Result best = results.get(0);
-                test.setSummary(getString(R.string.dns_fastest, best.server, best.latencyMs));
-                Toast.makeText(requireContext(), getString(R.string.dns_fastest, best.server, best.latencyMs), Toast.LENGTH_LONG).show();
+                if (test != null) {
+                    if (results.isEmpty()) test.setSummary(R.string.dns_no_result);
+                    else test.setSummary(getString(R.string.dns_fastest, results.get(0).server, results.get(0).latencyMs));
+                }
+                showDnsBenchmarkDialog(results);
             });
         }).start();
+    }
+
+    private void showDnsBenchmarkDialog(java.util.List<DnsBenchmark.Result> results) {
+        LinearLayout root = new LinearLayout(requireContext());
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(24, 8, 24, 8);
+        TextView title = new TextView(requireContext());
+        title.setText("پینگ DNS بر حسب میلی‌ثانیه");
+        title.setTextSize(14);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        title.setPadding(0, 0, 0, 12);
+        root.addView(title);
+        if (results.isEmpty()) {
+            TextView empty = new TextView(requireContext());
+            empty.setText(R.string.dns_no_result);
+            root.addView(empty);
+        } else {
+            long max = Math.max(1, results.get(results.size()-1).latencyMs);
+            for (int i = 0; i < results.size(); i++) {
+                DnsBenchmark.Result r = results.get(i);
+                LinearLayout row = new LinearLayout(requireContext());
+                row.setOrientation(LinearLayout.VERTICAL);
+                row.setPadding(0, 5, 0, 5);
+                TextView label = new TextView(requireContext());
+                label.setText((i + 1) + ".  " + r.server + "     " + r.latencyMs + " ms");
+                label.setTextSize(14);
+                row.addView(label);
+                ProgressBar bar = new ProgressBar(requireContext(), null, android.R.attr.progressBarStyleHorizontal);
+                bar.setMax((int)Math.min(Integer.MAX_VALUE, max));
+                bar.setProgress((int)Math.min(max, r.latencyMs));
+                row.addView(bar, new LinearLayout.LayoutParams(-1, 10));
+                root.addView(row);
+            }
+        }
+        ScrollView scroll = new ScrollView(requireContext());
+        scroll.addView(root);
+        new AlertDialog.Builder(requireContext())
+                .setTitle("نتیجه تست DNS")
+                .setMessage(results.isEmpty() ? null : "DNSها از سریع‌ترین تا کندترین مرتب شده‌اند. مقدار کمتر بهتر است.")
+                .setView(scroll)
+                .setPositiveButton(R.string.dialog_confirm, null)
+                .show();
+    }
+
+    private void showTrafficUsage() {
+        final TextView text = new TextView(requireContext());
+        text.setTextSize(16);
+        text.setGravity(Gravity.CENTER);
+        text.setPadding(24, 30, 24, 30);
+        final AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.pref_traffic_usage)
+                .setView(text)
+                .setPositiveButton(R.string.dialog_confirm, null)
+                .create();
+        final Handler h = new Handler(Looper.getMainLooper());
+        final Runnable updater = new Runnable() {
+            @Override public void run() {
+                if (!dialog.isShowing()) return;
+                text.setText(VhostsService.getTrafficSummary(requireContext()));
+                h.postDelayed(this, 1000);
+            }
+        };
+        dialog.setOnShowListener(d -> h.post(updater));
+        dialog.setOnDismissListener(d -> h.removeCallbacks(updater));
+        dialog.show();
     }
 
     private void loadDnsListFromUrl() {

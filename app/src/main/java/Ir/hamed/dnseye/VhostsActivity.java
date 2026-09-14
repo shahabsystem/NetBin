@@ -21,6 +21,8 @@ package Ir.hamed.dnseye;
 import android.content.*;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
+import android.content.pm.PackageManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -56,6 +58,9 @@ public class VhostsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ThemeUtils.apply(this);
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 7001);
+        }
         launch();
 
 //        StatService.autoTrace(this, true, false);

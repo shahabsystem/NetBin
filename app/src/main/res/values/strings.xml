@@ -57,7 +57,15 @@
     <string name="pref_auto_dns">انتخاب خودکار سریع‌ترین DNS</string>
     <string name="pref_auto_dns_summary">هنگام اتصال، DNSها را هم‌زمان تست می‌کند و سریع‌ترین‌ها را اعمال می‌کند.</string>
     <string name="pref_test_dns">تست سرعت DNSها</string>
-    <string name="pref_test_dns_summary">تاخیر DNSهای موجود را اندازه‌گیری و نتیجه را نمایش می‌دهد.</string>
+    <string name="pref_test_dns_summary">تاخیر DNSهای موجود را اندازه‌گیری و نتیجه را به صورت نمودار ساده نشان می‌دهد.</string>
+    <string name="pref_traffic_usage">مصرف ترافیک NETBIN</string>
+    <string name="pref_traffic_usage_summary">حجم ارسال و دریافت‌شده از تونل فعلی و مجموع مصرف را ببینید.</string>
+    <string name="traffic_upload">ارسال</string>
+    <string name="traffic_download">دریافت</string>
+    <string name="traffic_total">مجموع</string>
+    <string name="traffic_session">این اتصال</string>
+    <string name="traffic_reset">صفر کردن آمار کلی</string>
+    <string name="blocked_notice">وقتی دامنه‌ای توسط NETBIN مسدود شود، اعلان مسدودی نمایش داده می‌شود. نمایش صفحه داخل مرورگر برای HTTPS به دلیل رمزنگاری مستقیم مرورگر قابل تزریق نیست.</string>
     <string name="dns_add">افزودن DNS</string>
     <string name="dns_name">نام DNS</string>
     <string name="dns_address">آدرس IPv4</string>

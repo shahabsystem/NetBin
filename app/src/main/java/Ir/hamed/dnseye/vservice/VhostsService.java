@@ -45,6 +45,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.Selector;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -82,12 +83,28 @@ public class VhostsService extends VpnService {
     private NetworkReceiver netStateReceiver;
     private static boolean isOAndBoot = false;
 
+    private static final AtomicLong sessionUploaded = new AtomicLong(0);
+    private static final AtomicLong sessionDownloaded = new AtomicLong(0);
+    private static final AtomicLong totalUploaded = new AtomicLong(0);
+    private static final AtomicLong totalDownloaded = new AtomicLong(0);
+    private static volatile long lastTrafficPersist = 0;
+    private static final String TOTAL_UP = "NETBIN_TOTAL_UP";
+    private static final String TOTAL_DOWN = "NETBIN_TOTAL_DOWN";
+    private static final String BLOCK_NOTIFICATION_CHANNEL = "netbin_blocked";
+
 
     @Override
     public void onCreate() {
 //        registerNetReceiver();
         super.onCreate();
         activeService = this;
+        sessionUploaded.set(0);
+        sessionDownloaded.set(0);
+        SharedPreferences initialTraffic = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        totalUploaded.set(initialTraffic.getLong(TOTAL_UP, 0L));
+        totalDownloaded.set(initialTraffic.getLong(TOTAL_DOWN, 0L));
+        lastTrafficPersist = System.currentTimeMillis();
+        DnsChange.setBlockedDomainListener((domain) -> notifyBlockedDomain(domain));
         if (isOAndBoot) {
             //android 8.0 boot
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -254,6 +271,71 @@ public class VhostsService extends VpnService {
 //        }
     }
 
+    public static long getSessionUploaded() { return sessionUploaded.get(); }
+    public static long getSessionDownloaded() { return sessionDownloaded.get(); }
+
+    private void addTraffic(Context context, boolean upload, long bytes) {
+        if (bytes <= 0) return;
+        if (upload) { sessionUploaded.addAndGet(bytes); totalUploaded.addAndGet(bytes); }
+        else { sessionDownloaded.addAndGet(bytes); totalDownloaded.addAndGet(bytes); }
+        long now = System.currentTimeMillis();
+        if (now - lastTrafficPersist >= 5000) persistTraffic(context);
+    }
+
+    private synchronized void persistTraffic(Context context) {
+        lastTrafficPersist = System.currentTimeMillis();
+        androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putLong(TOTAL_UP, totalUploaded.get())
+                .putLong(TOTAL_DOWN, totalDownloaded.get()).apply();
+    }
+
+    public static String formatBytes(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        double value = bytes / 1024.0;
+        if (value < 1024) return String.format(java.util.Locale.US, "%.1f KB", value);
+        value /= 1024.0;
+        if (value < 1024) return String.format(java.util.Locale.US, "%.1f MB", value);
+        value /= 1024.0;
+        return String.format(java.util.Locale.US, "%.2f GB", value);
+    }
+
+    public static String getTrafficSummary(Context context) {
+        long up = sessionUploaded.get(), down = sessionDownloaded.get();
+        long totalUp = totalUploaded.get(), totalDown = totalDownloaded.get();
+        return "این اتصال\n\n↑ ارسال: " + formatBytes(up) +
+                "\n↓ دریافت: " + formatBytes(down) +
+                "\nمجموع: " + formatBytes(up + down) +
+                "\n\nآمار کلی NETBIN\n\n↑ ارسال: " + formatBytes(totalUp) +
+                "\n↓ دریافت: " + formatBytes(totalDown) +
+                "\nمجموع: " + formatBytes(totalUp + totalDown);
+    }
+
+    public static void resetTraffic(Context context) {
+        totalUploaded.set(0); totalDownloaded.set(0);
+        androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putLong(TOTAL_UP, 0).putLong(TOTAL_DOWN, 0).apply();
+    }
+
+    private void notifyBlockedDomain(String domain) {
+        try {
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(BLOCK_NOTIFICATION_CHANNEL, "NETBIN Blocked", NotificationManager.IMPORTANCE_LOW);
+                manager.createNotificationChannel(channel);
+            }
+            Intent intent = new Intent(this, VhostsActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(this, 991, intent, PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
+            Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
+                    new Notification.Builder(this, BLOCK_NOTIFICATION_CHANNEL) : new Notification.Builder(this);
+            builder.setSmallIcon(R.mipmap.ic_launcher_modern)
+                    .setContentTitle("NETBIN: دامنه مسدود شد")
+                    .setContentText(domain)
+                    .setStyle(new Notification.BigTextStyle().bigText("این دامنه توسط فهرست مسدودسازی NETBIN مسدود شد: " + domain))
+                    .setContentIntent(pi).setAutoCancel(true);
+            manager.notify((int)(System.currentTimeMillis() & 0x7fffffff), builder.build());
+        } catch (Exception e) { LogUtils.e(TAG, "blocked notification", e); }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -317,7 +399,10 @@ public class VhostsService extends VpnService {
 
     @Override
     public void onDestroy() {
+        try { persistTraffic(this); } catch (Exception ignored) {}
+        DnsChange.setBlockedDomainListener(null);
         stopVService();
+        activeService = null;
         super.onDestroy();
     }
 
@@ -380,6 +465,7 @@ public class VhostsService extends VpnService {
                     // TODO: Block when not connected
                     int readBytes = vpnInput.read(bufferToNetwork);
                     if (readBytes > 0) {
+                        addTraffic(VhostsService.this, true, readBytes);
                         dataSent = true;
                         bufferToNetwork.flip();
                         Packet packet = new Packet(bufferToNetwork);
@@ -404,7 +490,9 @@ public class VhostsService extends VpnService {
                                 LogUtils.e(TAG, e.toString(), e);
                                 break;
                             }
+                        int deliveredBytes = bufferFromNetwork.remaining();
                         dataReceived = true;
+                        addTraffic(VhostsService.this, false, deliveredBytes);
                         ByteBufferPool.release(bufferFromNetwork);
                     } else {
                         dataReceived = false;

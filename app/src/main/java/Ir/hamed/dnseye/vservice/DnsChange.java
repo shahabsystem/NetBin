@@ -33,6 +33,10 @@ import java.util.regex.Pattern;
 
 public class DnsChange {
 
+    public interface BlockedDomainListener { void onBlocked(String domain); }
+    private static volatile BlockedDomainListener blockedDomainListener;
+    public static void setBlockedDomainListener(BlockedDomainListener listener) { blockedDomainListener = listener; }
+
     static String TAG = DnsChange.class.getSimpleName();
     static ConcurrentHashMap<String, String> DOMAINS_IP_MAPS4 = null;
     static ConcurrentHashMap<String, String> DOMAINS_IP_MAPS6 = null;
@@ -95,6 +99,9 @@ public class DnsChange {
             packet.updateUDPBuffer(packet_buffer, packet_buffer.remaining());
             packet_buffer.position(packet_buffer.limit());
             LogUtils.d(TAG, "hit: " + question.getType() + " :" + query_domain.toString() + " :" + address.getHostName());
+            if ("0.0.0.0".equals(address.getHostAddress()) && blockedDomainListener != null) {
+                try { blockedDomainListener.onBlocked(query_domain.toString()); } catch (Exception ignored) {}
+            }
             return packet_buffer;
         } catch (Exception e) {
             LogUtils.d(TAG, "dns hook error", e);

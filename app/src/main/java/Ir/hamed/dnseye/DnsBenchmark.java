@@ -27,7 +27,7 @@ public final class DnsBenchmark {
     public static final class Result {
         public final String server;
         public final long latencyMs;
-        Result(String server, long latencyMs) { this.server = server; this.latencyMs = latencyMs; }
+        public Result(String server, long latencyMs) { this.server = server; this.latencyMs = latencyMs; }
     }
 
     public static List<String> getCandidateServers(Context context, SharedPreferences prefs) {
@@ -77,7 +77,7 @@ public final class DnsBenchmark {
         return results;
     }
 
-    private static Result testOne(String server, int timeoutMs) {
+    public static Result testOne(String server, int timeoutMs) {
         DatagramSocket socket = null;
         try {
             InetAddress address = InetAddress.getByName(server);
