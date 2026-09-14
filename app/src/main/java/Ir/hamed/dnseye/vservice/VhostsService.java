@@ -140,7 +140,7 @@ public class VhostsService extends VpnService {
             executorService.submit(new UDPOutput(deviceToNetworkUDPQueue, networkToDeviceQueue, udpSelector, udpSelectorLock, this));
             executorService.submit(new TCPInput(networkToDeviceQueue, tcpSelector, tcpSelectorLock));
             executorService.submit(new TCPOutput(deviceToNetworkTCPQueue, networkToDeviceQueue, tcpSelector, tcpSelectorLock, this));
-            executorService.submit(new VPNRunnable(vpnInterface.getFileDescriptor(),
+            executorService.submit(new VPNRunnable(getApplicationContext(), vpnInterface.getFileDescriptor(),
                     deviceToNetworkUDPQueue, deviceToNetworkTCPQueue, networkToDeviceQueue));
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_VPN_STATE).putExtra("running", true));
             LogUtils.i(TAG, "Started");
@@ -274,7 +274,7 @@ public class VhostsService extends VpnService {
     public static long getSessionUploaded() { return sessionUploaded.get(); }
     public static long getSessionDownloaded() { return sessionDownloaded.get(); }
 
-    private void addTraffic(Context context, boolean upload, long bytes) {
+    private static void addTraffic(Context context, boolean upload, long bytes) {
         if (bytes <= 0) return;
         if (upload) { sessionUploaded.addAndGet(bytes); totalUploaded.addAndGet(bytes); }
         else { sessionDownloaded.addAndGet(bytes); totalDownloaded.addAndGet(bytes); }
@@ -428,6 +428,7 @@ public class VhostsService extends VpnService {
     }
 
     private static class VPNRunnable implements Runnable {
+        private final Context context;
         private static final String TAG = VPNRunnable.class.getSimpleName();
 
         private FileDescriptor vpnFileDescriptor;
@@ -436,10 +437,11 @@ public class VhostsService extends VpnService {
         private ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
         private ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue;
 
-        public VPNRunnable(FileDescriptor vpnFileDescriptor,
+        public VPNRunnable(Context context, FileDescriptor vpnFileDescriptor,
                            ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue,
                            ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue,
                            ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue) {
+            this.context = context.getApplicationContext();
             this.vpnFileDescriptor = vpnFileDescriptor;
             this.deviceToNetworkUDPQueue = deviceToNetworkUDPQueue;
             this.deviceToNetworkTCPQueue = deviceToNetworkTCPQueue;
@@ -465,7 +467,7 @@ public class VhostsService extends VpnService {
                     // TODO: Block when not connected
                     int readBytes = vpnInput.read(bufferToNetwork);
                     if (readBytes > 0) {
-                        addTraffic(VhostsService.this, true, readBytes);
+                        addTraffic(context, true, readBytes);
                         dataSent = true;
                         bufferToNetwork.flip();
                         Packet packet = new Packet(bufferToNetwork);
@@ -483,6 +485,7 @@ public class VhostsService extends VpnService {
                     ByteBuffer bufferFromNetwork = networkToDeviceQueue.poll();
                     if (bufferFromNetwork != null) {
                         bufferFromNetwork.flip();
+                        int deliveredBytes = bufferFromNetwork.remaining();
                         while (bufferFromNetwork.hasRemaining())
                             try {
                                 vpnOutput.write(bufferFromNetwork);
@@ -490,9 +493,8 @@ public class VhostsService extends VpnService {
                                 LogUtils.e(TAG, e.toString(), e);
                                 break;
                             }
-                        int deliveredBytes = bufferFromNetwork.remaining();
                         dataReceived = true;
-                        addTraffic(VhostsService.this, false, deliveredBytes);
+                        addTraffic(context, false, deliveredBytes);
                         ByteBufferPool.release(bufferFromNetwork);
                     } else {
                         dataReceived = false;
