@@ -77,8 +77,11 @@
     <string name="dns_testing">در حال تست DNSها…</string>
     <string name="dns_fastest">سریع‌ترین DNS: %1$s — %2$d ms</string>
     <string name="dns_no_result">هیچ DNS قابل دسترسی پیدا نشد.</string>
-    <string name="dns_manage_hint">برای انتخاب لمس کنید؛ برای حذف DNS سفارشی از دکمه حذف استفاده کنید.</string>
+    <string name="dns_manage_hint">یک DNS را انتخاب کنید. برای DNS سفارشی می‌توانید حذف یا ویرایش انجام دهید.</string>
     <string name="pref_dns_title">استفاده از DNS سفارشی</string>
+    <string name="pref_dns_title_summary">با خاموش بودن این گزینه، DNS پیش‌فرض برنامه استفاده می‌شود.</string>
+    <string name="pref_dns_primary_summary">DNS اصلی انتخاب‌شده برای تونل VPN.</string>
+    <string name="pref_dns_secondary_summary">DNS پشتیبان برای تونل VPN.</string>
     <string name="download_alert">در حال دریافت فهرست…</string>
     <string name="no_net_record">فهرست اینترنتی رکورد قابل استفاده‌ای ندارد؛ منبع را بررسی کنید.</string>
     <string name="no_local_record">فایل محلی رکورد قابل استفاده‌ای ندارد؛ فایل را بررسی کنید.</string>

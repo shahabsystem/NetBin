@@ -84,6 +84,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         final SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         PreferenceScreen prefScreen = getPreferenceScreen();
         handeleSummary(prefScreen, sharedPreferences);
+        updateDnsSummaries();
         Preference urlCustomPref = findPreference(HOSTS_URL);
         Preference dnsCustomPref = findPreference(IPV4_DNS);
 
@@ -200,65 +201,153 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
     private void showDnsManager() {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        final LinearLayout root = new LinearLayout(requireContext());
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(24, 8, 24, 8);
+
+        final TextView current = new TextView(requireContext());
+        current.setTextSize(14);
+        current.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        current.setPadding(4, 4, 4, 12);
+        root.addView(current);
+
+        final android.widget.EditText search = new android.widget.EditText(requireContext());
+        search.setSingleLine(true);
+        search.setHint("جستجو در نام یا آدرس DNS…");
+        search.setPadding(18, 10, 18, 10);
+        root.addView(search, new LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT));
+
         final LinearLayout list = new LinearLayout(requireContext());
         list.setOrientation(LinearLayout.VERTICAL);
-        list.setPadding(24, 12, 24, 8);
-        TextView hint = new TextView(requireContext());
-        hint.setText(getString(R.string.dns_manage_hint));
-        hint.setPadding(0, 0, 0, 16);
-        list.addView(hint);
-        final android.widget.RadioGroup group = new android.widget.RadioGroup(requireContext());
-        group.setOrientation(android.widget.RadioGroup.VERTICAL);
-        String active = prefs.getString(IPV4_DNS, "1.1.1.1");
-        for (DnsListRepository.Entry item : DnsListRepository.load(requireContext()))
-            addDnsRow(group, item.name, item.primary, item.secondary, active, false);
-        JSONArray custom = getCustomDns();
-        for (int i = 0; i < custom.length(); i++) {
-            try {
-                JSONObject o = custom.getJSONObject(i);
-                addDnsRow(group, o.optString("name", "سفارشی"), o.getString("ip"), "", active, true);
-            } catch (Exception ignored) {}
-        }
-        list.addView(group);
-        android.widget.ScrollView scroll = new android.widget.ScrollView(requireContext());
+        final ScrollView scroll = new ScrollView(requireContext());
+        scroll.setFillViewport(true);
         scroll.addView(list);
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.pref_manage_dns)
-                .setView(scroll)
+        root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+
+        final AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setTitle("انتخاب DNS")
+                .setView(root)
                 .setPositiveButton(R.string.dns_add, null)
                 .setNegativeButton(R.string.dialog_cancel, null)
                 .create();
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> showAddDnsDialog(dialog)));
+
+        final java.util.List<DnsListRepository.Entry> builtIn = DnsListRepository.load(requireContext());
+        final JSONArray custom = getCustomDns();
+
+        Runnable refresh = new Runnable() {
+            @Override public void run() {
+                list.removeAllViews();
+                String query = search.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
+                String active = prefs.getString(IPV4_DNS, "1.1.1.1");
+                String active2 = prefs.getString(IPV4_DNS2, "9.9.9.9");
+                current.setText("DNS فعال: " + active + (active2.isEmpty() ? "" : "  •  " + active2));
+
+                int shown = 0;
+                for (DnsListRepository.Entry item : builtIn) {
+                    if (matchesDns(query, item.name, item.primary, item.secondary)) {
+                        addDnsCard(list, item.name, item.primary, item.secondary, active, false, dialog);
+                        shown++;
+                    }
+                }
+                for (int i = 0; i < custom.length(); i++) {
+                    try {
+                        JSONObject o = custom.getJSONObject(i);
+                        String name = o.optString("name", "DNS سفارشی");
+                        String ip = o.optString("ip", "");
+                        if (matchesDns(query, name, ip, "")) {
+                            addDnsCard(list, name, ip, "", active, true, dialog);
+                            shown++;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (shown == 0) {
+                    TextView empty = new TextView(requireContext());
+                    empty.setText("DNS موردنظر پیدا نشد. از «افزودن DNS» استفاده کنید.");
+                    empty.setPadding(12, 24, 12, 24);
+                    list.addView(empty);
+                }
+            }
+        };
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            public void onTextChanged(CharSequence s, int st, int b, int c) { refresh.run(); }
+            public void afterTextChanged(android.text.Editable e) {}
+        });
+        dialog.setOnShowListener(d -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> showAddDnsDialog(dialog));
+            refresh.run();
+        });
         dialog.show();
     }
 
-    private void addDnsRow(android.widget.RadioGroup group, String name, String primary, String secondary, String active, boolean removable) {
-        LinearLayout row = new LinearLayout(requireContext());
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        android.widget.RadioButton rb = new android.widget.RadioButton(requireContext());
-        String label = name + "  •  " + primary + (secondary.isEmpty() ? "" : " / " + secondary);
-        rb.setText(label);
-        rb.setTextSize(15);
-        rb.setChecked(primary.equals(active));
-        row.addView(rb, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        if (removable) {
-            android.widget.Button del = new android.widget.Button(requireContext());
-            del.setText("×");
-            del.setMinWidth(48);
-            del.setOnClickListener(v -> { removeCustomDns(primary); showDnsManager(); });
-            row.addView(del, new LinearLayout.LayoutParams(56, ViewGroup.LayoutParams.WRAP_CONTENT));
-        }
-        rb.setOnClickListener(v -> {
-            SharedPreferences.Editor e = getPreferenceScreen().getSharedPreferences().edit();
-            e.putString(IPV4_DNS, primary).putString(IPV4_DNS2, secondary.isEmpty() ? primary : secondary)
+    private boolean matchesDns(String query, String name, String primary, String secondary) {
+        if (query.isEmpty()) return true;
+        String all = (name + " " + primary + " " + secondary).toLowerCase(java.util.Locale.ROOT);
+        return all.contains(query);
+    }
+
+    private void addDnsCard(LinearLayout list, String name, String primary, String secondary,
+                            String active, boolean removable, AlertDialog parent) {
+        LinearLayout card = new LinearLayout(requireContext());
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(18, 14, 18, 14);
+        card.setBackgroundResource(android.R.drawable.dialog_holo_light_frame);
+
+        LinearLayout top = new LinearLayout(requireContext());
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title = new TextView(requireContext());
+        title.setText(name);
+        title.setTextSize(16);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        top.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
+        TextView state = new TextView(requireContext());
+        state.setText(primary.equals(active) ? "✓ فعال" : "انتخاب");
+        state.setTextSize(13);
+        top.addView(state);
+        card.addView(top);
+
+        TextView address = new TextView(requireContext());
+        address.setText(primary + (secondary.isEmpty() ? "" : "   •   " + secondary));
+        address.setTextSize(14);
+        address.setPadding(0, 6, 0, 0);
+        card.addView(address);
+
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(-1, -2);
+        cp.setMargins(0, 0, 0, 10);
+        list.addView(card, cp);
+
+        card.setOnClickListener(v -> {
+            getPreferenceScreen().getSharedPreferences().edit()
+                    .putString(IPV4_DNS, primary)
+                    .putString(IPV4_DNS2, secondary.isEmpty() ? primary : secondary)
                     .putBoolean(IS_CUS_DNS, true).apply();
-            Preference p = findPreference(IPV4_DNS);
-            Preference p2 = findPreference(IPV4_DNS2);
-            if (p != null) p.setSummary(primary);
-            if (p2 != null) p2.setSummary(secondary.isEmpty() ? primary : secondary);
+            updateDnsSummaries();
             Toast.makeText(requireContext(), R.string.dns_selected, Toast.LENGTH_SHORT).show();
+            parent.dismiss();
         });
-        group.addView(row);
+
+        if (removable) {
+            TextView delete = new TextView(requireContext());
+            delete.setText("حذف این DNS");
+            delete.setTextSize(13);
+            delete.setPadding(0, 10, 0, 0);
+            delete.setOnClickListener(v -> {
+                removeCustomDns(primary);
+                parent.dismiss();
+                showDnsManager();
+            });
+            card.addView(delete);
+        }
+    }
+
+    private void updateDnsSummaries() {
+        SharedPreferences p = getPreferenceScreen().getSharedPreferences();
+        Preference primary = findPreference(IPV4_DNS);
+        Preference secondary = findPreference(IPV4_DNS2);
+        if (primary != null) primary.setSummary("فعال: " + p.getString(IPV4_DNS, "1.1.1.1"));
+        if (secondary != null) secondary.setSummary("پشتیبان: " + p.getString(IPV4_DNS2, "9.9.9.9"));
+        Preference manage = findPreference("MANAGE_DNS");
+        if (manage != null) manage.setSummary("انتخاب سریع DNS • " + p.getString(IPV4_DNS, "1.1.1.1"));
     }
 
     private void showAddDnsDialog(final AlertDialog parent) {
@@ -299,19 +388,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 .remove(CUSTOM_DNS_LIST).putBoolean(AUTO_DNS, false).putBoolean(DNS_ONLY_BUNDLED, false)
                 .putString(IPV4_DNS, "1.1.1.1").putString(IPV4_DNS2, "9.9.9.9").apply();
         handeleSummary(getPreferenceScreen(), getPreferenceScreen().getSharedPreferences());
+        updateDnsSummaries();
         Toast.makeText(requireContext(), R.string.dns_reset, Toast.LENGTH_SHORT).show();
     }
 
     private void testDnsFromSettings() {
         final Preference test = findPreference("TEST_DNS");
         if (test != null) test.setSummary(R.string.dns_testing);
+        final Context testContext = requireContext().getApplicationContext();
         new Thread(() -> {
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-            List<String> servers = DnsBenchmark.getCandidateServers(requireContext(), prefs);
+            List<String> servers = DnsBenchmark.getCandidateServers(testContext, prefs);
             int timeoutValue = 1200;
             try { timeoutValue = Math.max(300, Math.min(5000, Integer.parseInt(prefs.getString(DNS_TEST_TIMEOUT, "1200")))); } catch (Exception ignored) {}
             final int timeout = timeoutValue;
             java.util.List<DnsBenchmark.Result> results = DnsBenchmark.test(servers, timeout);
+            if (!isAdded()) return;
             requireActivity().runOnUiThread(() -> {
                 if (test != null) {
                     if (results.isEmpty()) test.setSummary(R.string.dns_no_result);

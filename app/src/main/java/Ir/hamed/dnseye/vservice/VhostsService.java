@@ -110,17 +110,29 @@ public class VhostsService extends VpnService {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel("vhosts_channel_id", "System", NotificationManager.IMPORTANCE_NONE);
                 NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.createNotificationChannel(channel);
-                Notification notification = new Notification.Builder(this, "vhosts_channel_id")
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Virtual Hosts Running")
-                        .build();
-                startForeground(1, notification);
+                if (manager != null) manager.createNotificationChannel(channel);
+                try {
+                    Notification notification = new Notification.Builder(this, "vhosts_channel_id")
+                            .setSmallIcon(R.mipmap.ic_launcher_modern)
+                            .setContentTitle("NETBIN در حال اجراست")
+                            .build();
+                    startForeground(1, notification);
+                } catch (Throwable e) {
+                    LogUtils.e(TAG, "Unable to enter foreground mode on boot", e);
+                    stopSelf();
+                    return;
+                }
             }
             isOAndBoot = false;
         }
-        setupHostFile();
-        setupVPN();
+        try {
+            setupHostFile();
+            setupVPN();
+        } catch (Throwable e) {
+            LogUtils.e(TAG, "NETBIN startup failed; stopping service safely", e);
+            stopVService();
+            return;
+        }
         if (vpnInterface == null) {
             LogUtils.d(TAG, "unknow error");
             stopVService();
