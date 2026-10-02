@@ -19,5 +19,6 @@
 0.0.0.0 adivery.com
 0.0.0.0 ad.sabavision.com
 0.0.0.0 ads.sabavision.com
+0.0.0.0 https://api.mediaad.org
 
 # --- دامنه‌های خودتان را از اینجا اضافه کنید ---
